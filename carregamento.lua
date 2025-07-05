@@ -12,7 +12,7 @@ local fundo = Instance.new("ImageLabel", screenGui)
 fundo.Size = UDim2.new(1, 0, 1, 0)
 fundo.Position = UDim2.new(0, 0, 0, 0)
 fundo.BackgroundTransparency = 1
-fundo.Image = "https://raw.githubusercontent.com/rubzinbr/jogorobloxhub/refs/heads/main/teladeloadimage.png"
+fundo.Image = "https://raw.githubusercontent.com/rubzinbr/jogorobloxhub/main/teladeloadimage.png"
 fundo.ImageColor3 = Color3.new(1, 1, 1)
 fundo.ScaleType = Enum.ScaleType.Crop
 
