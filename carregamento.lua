@@ -1,5 +1,5 @@
 
--- Jogoroblox HUB - Tela de carregamento com fundo roxo personalizado
+-- Jogoroblox HUB - Tela de carregamento com fundo preto e contorno giratório
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 
@@ -7,14 +7,11 @@ local RunService = game:GetService("RunService")
 local screenGui = Instance.new("ScreenGui", game.CoreGui)
 screenGui.Name = "JogorobloxLoading"
 
--- Fundo com imagem do GitHub
-local fundo = Instance.new("ImageLabel", screenGui)
+-- Fundo preto
+local fundo = Instance.new("Frame", screenGui)
 fundo.Size = UDim2.new(1, 0, 1, 0)
 fundo.Position = UDim2.new(0, 0, 0, 0)
-fundo.BackgroundTransparency = 1
-fundo.Image = "https://raw.githubusercontent.com/rubzinbr/jogorobloxhub/main/teladeloadimage.png"
-fundo.ImageColor3 = Color3.new(1, 1, 1)
-fundo.ScaleType = Enum.ScaleType.Crop
+fundo.BackgroundColor3 = Color3.new(0, 0, 0)
 
 -- Barra de carregamento
 local barra = Instance.new("Frame", fundo)
@@ -33,22 +30,20 @@ texto.BackgroundTransparency = 1
 texto.Font = Enum.Font.GothamBold
 texto.TextSize = 24
 
--- Contorno giratório
-local borderFrame = Instance.new("Frame", fundo)
-borderFrame.Size = UDim2.new(1, 0, 1, 0)
-borderFrame.BackgroundTransparency = 1
-borderFrame.ZIndex = 2
+-- Contorno giratório (usando círculo visível)
+local contorno = Instance.new("ImageLabel")
+contorno.Name = "ContornoGiratorio"
+contorno.Parent = fundo
+contorno.Size = UDim2.new(1, 40, 1, 40)
+contorno.Position = UDim2.new(0, -20, 0, -20)
+contorno.BackgroundTransparency = 1
+contorno.Image = "rbxassetid://13533683303" -- ID de círculo decorativo
+contorno.ImageColor3 = Color3.fromRGB(128, 0, 255)
+contorno.ZIndex = 0
 
-local border = Instance.new("ImageLabel", borderFrame)
-border.Size = UDim2.new(1, 0, 1, 0)
-border.BackgroundTransparency = 1
-border.Image = "rbxassetid://13533683303" -- Círculo decorativo
-border.ImageColor3 = Color3.fromRGB(128, 0, 255)
-border.ZIndex = 2
-
--- Rotação contínua do contorno
+-- Animação do contorno
 RunService.RenderStepped:Connect(function()
-    border.Rotation = (border.Rotation + 1) % 360
+    contorno.Rotation = (contorno.Rotation + 1) % 360
 end)
 
 -- Animação da barra
