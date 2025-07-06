@@ -1,88 +1,93 @@
 
--- Jogoroblox HUB - Texto centralizado sobre a barra de carregamento
+-- Jogoroblox HUB - Sistema de Key com animação da barra para a caixa
 local TweenService = game:GetService("TweenService")
 
--- Criar GUI
+-- Tela de carregamento
 local screenGui = Instance.new("ScreenGui", game:GetService("CoreGui"))
-screenGui.Name = "JogorobloxLoading"
+screenGui.Name = "JogorobloxHubLoading"
 screenGui.IgnoreGuiInset = true
 
--- Fundo preto
 local fundo = Instance.new("Frame", screenGui)
 fundo.Size = UDim2.new(1, 0, 1, 0)
 fundo.Position = UDim2.new(0, 0, 0, 0)
 fundo.BackgroundColor3 = Color3.new(0, 0, 0)
 
--- Contorno da barra
+-- Contorno e barra
 local contorno = Instance.new("Frame", fundo)
 contorno.Size = UDim2.new(0.5, 4, 0, 24)
 contorno.Position = UDim2.new(0.25, -2, 0.5, -2)
 contorno.BackgroundColor3 = Color3.fromRGB(100, 0, 180)
 Instance.new("UICorner", contorno).CornerRadius = UDim.new(0, 12)
 
--- Barra de progresso
 local barra = Instance.new("Frame", contorno)
 barra.Size = UDim2.new(0, 0, 1, 0)
-barra.Position = UDim2.new(0, 0, 0, 0)
 barra.BackgroundColor3 = Color3.fromRGB(150, 0, 255)
 Instance.new("UICorner", barra).CornerRadius = UDim.new(0, 10)
 
--- Texto "Jogoroblox HUB" com letras mais próximas e centralizado
-local texto = "Jogoroblox HUB"
-local letras = {}
-local totalLetras = #texto
-local letraLargura = 0.035
+-- Texto "Jogoroblox HUB"
+local textoLabel = Instance.new("TextLabel", fundo)
+textoLabel.Text = "Jogoroblox HUB"
+textoLabel.Size = UDim2.new(1, 0, 0, 40)
+textoLabel.Position = UDim2.new(0, 0, 0.5, -60)
+textoLabel.BackgroundTransparency = 1
+textoLabel.TextColor3 = Color3.new(1, 1, 1)
+textoLabel.Font = Enum.Font.GothamBold
+textoLabel.TextScaled = true
 
-local textoContainer = Instance.new("Frame", fundo)
-textoContainer.Size = UDim2.new(letraLargura * totalLetras, 0, 0.05, 0)
-textoContainer.Position = UDim2.new(0.5 - (letraLargura * totalLetras / 2), 0, 0.5, -50)
-textoContainer.BackgroundTransparency = 1
-
-for i = 1, totalLetras do
-    local letra = texto:sub(i, i)
-    local label = Instance.new("TextLabel", textoContainer)
-    label.Text = letra
-    label.Size = UDim2.new(letraLargura, 0, 1, 0)
-    label.Position = UDim2.new((i - 1) * letraLargura, 0, 0, 0)
-    label.BackgroundTransparency = 1
-    label.TextColor3 = Color3.new(1, 1, 1)
-    label.Font = Enum.Font.GothamBold
-    label.TextScaled = true
-    table.insert(letras, label)
-end
-
--- Animação das letras
-local function animarLetras()
-    for i, letra in ipairs(letras) do
-        local original = letra.Position
-        local tweenInfo = TweenInfo.new(0.15, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
-
-        local props = {Position = original + UDim2.new(0, 0, -0.2, 0)}
-        local tween = TweenService:Create(letra, tweenInfo, props)
-        tween:Play()
-
-        tween.Completed:Wait()
-
-        -- Girar o J
-        if i == 1 then
-            local rotTween = TweenService:Create(letra, TweenInfo.new(0.3), {Rotation = 360})
-            rotTween:Play()
-            rotTween.Completed:Wait()
-            letra.Rotation = 0
-        end
-
-        local returnTween = TweenService:Create(letra, TweenInfo.new(0.1), {Position = original})
-        returnTween:Play()
-    end
-end
-
--- Animação da barra + trigger
+-- Barra animada
 for i = 1, 100 do
     barra.Size = UDim2.new(i / 100, 0, 1, 0)
-    if i == 50 then
-        animarLetras()
-    end
     wait(0.01)
 end
 
-screenGui:Destroy()
+-- Animação da barra virando campo de key
+local novaPos = UDim2.new(0.5, -150, 0.5, -20)
+local novaTam = UDim2.new(0, 300, 0, 40)
+
+local tweenPos = TweenService:Create(contorno, TweenInfo.new(0.5), {Position = novaPos})
+local tweenSize = TweenService:Create(contorno, TweenInfo.new(0.5), {Size = novaTam})
+
+tweenPos:Play()
+tweenSize:Play()
+tweenSize.Completed:Wait()
+
+-- Trocar cor da barra para roxo escuro
+barra.BackgroundColor3 = Color3.fromRGB(120, 0, 200)
+contorno.BackgroundColor3 = Color3.fromRGB(120, 0, 200)
+barra.Size = UDim2.new(1, 0, 1, 0)
+
+-- Substituir texto da barra por campo de key
+local caixa = Instance.new("TextBox", contorno)
+caixa.PlaceholderText = "Digite a Key"
+caixa.Size = UDim2.new(1, 0, 1, 0)
+caixa.Position = UDim2.new(0, 0, 0, 0)
+caixa.BackgroundTransparency = 1
+caixa.TextColor3 = Color3.new(1, 1, 1)
+caixa.Font = Enum.Font.Gotham
+caixa.TextScaled = true
+caixa.Text = ""
+Instance.new("UICorner", caixa).CornerRadius = UDim.new(0, 8)
+
+-- Botão verificar
+local botao = Instance.new("TextButton", fundo)
+botao.Text = "Verificar"
+botao.Size = UDim2.new(0, 150, 0, 35)
+botao.Position = UDim2.new(0.5, -75, 0.5, 30)
+botao.BackgroundColor3 = Color3.fromRGB(100, 0, 180)
+botao.TextColor3 = Color3.new(1, 1, 1)
+botao.Font = Enum.Font.GothamBold
+botao.TextScaled = true
+Instance.new("UICorner", botao).CornerRadius = UDim.new(0, 8)
+
+-- Verificação de chave
+local keyCorreta = "jogoroblox123"
+
+botao.MouseButton1Click:Connect(function()
+    if caixa.Text == keyCorreta then
+        screenGui:Destroy()
+        -- Aqui carrega o menu
+    else
+        caixa.Text = ""
+        caixa.PlaceholderText = "Key incorreta!"
+    end
+end)
