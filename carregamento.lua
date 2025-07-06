@@ -1,5 +1,5 @@
 
--- Jogoroblox HUB - Tela de carregamento com texto animado sem duplicação
+-- Jogoroblox HUB - Tela de carregamento com texto animado (fino e animado)
 local TweenService = game:GetService("TweenService")
 
 local gui = Instance.new("ScreenGui", game:GetService("CoreGui"))
@@ -23,7 +23,7 @@ barra.Size = UDim2.new(0, 0, 1, 0)
 barra.BackgroundColor3 = Color3.fromRGB(150, 0, 255)
 Instance.new("UICorner", barra).CornerRadius = UDim.new(0, 10)
 
--- Texto animado centralizado
+-- Texto animado (letras independentes)
 local textoOriginal = "Jogoroblox HUB"
 local letras = {}
 
@@ -33,20 +33,23 @@ for i = 1, #textoOriginal do
     local letraLbl = Instance.new("TextLabel", fundo)
     letraLbl.Text = letra
     letraLbl.Size = UDim2.new(0, 20, 0, 40)
-    letraLbl.Position = UDim2.new(baseX + (i-1)*0.024, 0, 0.5, -60)
+    letraLbl.Position = UDim2.new(baseX + (i-1)*0.024, 0, 0.43, 0)
     letraLbl.BackgroundTransparency = 1
-    letraLbl.Font = Enum.Font.GothamBlack
+    letraLbl.Font = Enum.Font.GothamMedium
     letraLbl.TextColor3 = Color3.new(1, 1, 1)
     letraLbl.TextScaled = true
+    letraLbl.Name = "Letra_"..i
     table.insert(letras, letraLbl)
 
     local info = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
     local props = {
-        Position = letraLbl.Position + UDim2.new(0, 0, 0, -8),
+        Position = letraLbl.Position - UDim2.new(0, 0, 0, 8),
         Rotation = letra == "J" and 360 or 0
     }
     local anim = TweenService:Create(letraLbl, info, props)
-    anim:Play()
+    task.delay(0.05 * i, function()
+        anim:Play()
+    end)
 end
 
 -- Encher barra
