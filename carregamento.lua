@@ -1,5 +1,5 @@
 
--- Jogoroblox HUB - Tela de carregamento com animação de letras mais próximas
+-- Jogoroblox HUB - Texto centralizado sobre a barra de carregamento
 local TweenService = game:GetService("TweenService")
 
 -- Criar GUI
@@ -27,16 +27,16 @@ barra.Position = UDim2.new(0, 0, 0, 0)
 barra.BackgroundColor3 = Color3.fromRGB(150, 0, 255)
 Instance.new("UICorner", barra).CornerRadius = UDim.new(0, 10)
 
--- Texto "Jogoroblox HUB" com letras mais próximas
-local textoContainer = Instance.new("Frame", fundo)
-textoContainer.Position = UDim2.new(0.25, 0, 0.5, -50)
-textoContainer.Size = UDim2.new(0.5, 0, 0.05, 0)
-textoContainer.BackgroundTransparency = 1
-
+-- Texto "Jogoroblox HUB" com letras mais próximas e centralizado
 local texto = "Jogoroblox HUB"
 local letras = {}
 local totalLetras = #texto
 local letraLargura = 0.035
+
+local textoContainer = Instance.new("Frame", fundo)
+textoContainer.Size = UDim2.new(letraLargura * totalLetras, 0, 0.05, 0)
+textoContainer.Position = UDim2.new(0.5 - (letraLargura * totalLetras / 2), 0, 0.5, -50)
+textoContainer.BackgroundTransparency = 1
 
 for i = 1, totalLetras do
     local letra = texto:sub(i, i)
@@ -51,7 +51,7 @@ for i = 1, totalLetras do
     table.insert(letras, label)
 end
 
--- Função para animar letras
+-- Animação das letras
 local function animarLetras()
     for i, letra in ipairs(letras) do
         local original = letra.Position
@@ -76,7 +76,7 @@ local function animarLetras()
     end
 end
 
--- Animação da barra + trigger de animação
+-- Animação da barra + trigger
 for i = 1, 100 do
     barra.Size = UDim2.new(i / 100, 0, 1, 0)
     if i == 50 then
