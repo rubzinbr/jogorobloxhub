@@ -1,5 +1,5 @@
 
--- Jogoroblox HUB - Tela de carregamento com texto animado (fino e animado)
+-- Jogoroblox HUB - Tela de carregamento com animação no texto (grosso e mais alto)
 local TweenService = game:GetService("TweenService")
 
 local gui = Instance.new("ScreenGui", game:GetService("CoreGui"))
@@ -23,7 +23,7 @@ barra.Size = UDim2.new(0, 0, 1, 0)
 barra.BackgroundColor3 = Color3.fromRGB(150, 0, 255)
 Instance.new("UICorner", barra).CornerRadius = UDim.new(0, 10)
 
--- Texto animado (letras independentes)
+-- Texto animado (letras independentes, fonte grossa)
 local textoOriginal = "Jogoroblox HUB"
 local letras = {}
 
@@ -32,10 +32,10 @@ for i = 1, #textoOriginal do
     local letra = textoOriginal:sub(i,i)
     local letraLbl = Instance.new("TextLabel", fundo)
     letraLbl.Text = letra
-    letraLbl.Size = UDim2.new(0, 20, 0, 40)
-    letraLbl.Position = UDim2.new(baseX + (i-1)*0.024, 0, 0.43, 0)
+    letraLbl.Size = UDim2.new(0, 25, 0, 55)
+    letraLbl.Position = UDim2.new(baseX + (i-1)*0.024, 0, 0.39, 0)
     letraLbl.BackgroundTransparency = 1
-    letraLbl.Font = Enum.Font.GothamMedium
+    letraLbl.Font = Enum.Font.GothamBold
     letraLbl.TextColor3 = Color3.new(1, 1, 1)
     letraLbl.TextScaled = true
     letraLbl.Name = "Letra_"..i
