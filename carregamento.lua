@@ -1,58 +1,104 @@
 
--- Tela de carregamento com animação antiga (texto animado letra por letra)
+-- Jogoroblox HUB - Tela de carregamento com animação no texto (grosso e mais alto)
 local TweenService = game:GetService("TweenService")
-local CoreGui = game:GetService("CoreGui")
 
-local tela = Instance.new("ScreenGui", CoreGui)
-tela.Name = "JogorobloxLoading"
+local gui = Instance.new("ScreenGui", game:GetService("CoreGui"))
+gui.Name = "JogorobloxHub"
+gui.IgnoreGuiInset = true
 
-local fundo = Instance.new("Frame", tela)
-fundo.BackgroundColor3 = Color3.new(0, 0, 0)
+local fundo = Instance.new("Frame", gui)
 fundo.Size = UDim2.new(1, 0, 1, 0)
+fundo.Position = UDim2.new(0, 0, 0, 0)
+fundo.BackgroundColor3 = Color3.new(0, 0, 0)
 
-local textoContainer = Instance.new("Frame", fundo)
-textoContainer.BackgroundTransparency = 1
-textoContainer.Position = UDim2.new(0.5, 0, 0.4, 0)
-textoContainer.AnchorPoint = Vector2.new(0.5, 0.5)
-textoContainer.Size = UDim2.new(0, 600, 0, 60)
+-- Contorno da barra
+local contorno = Instance.new("Frame", fundo)
+contorno.Size = UDim2.new(0.5, 0, 0, 20)
+contorno.Position = UDim2.new(0.25, 0, 0.5, 0)
+contorno.BackgroundColor3 = Color3.fromRGB(100, 0, 180)
+Instance.new("UICorner", contorno).CornerRadius = UDim.new(0, 10)
 
-local texto = "Jogoroblox HUB"
-for i = 1, #texto do
-    local letra = Instance.new("TextLabel", textoContainer)
-    letra.Text = texto:sub(i, i)
-    letra.Font = Enum.Font.GothamBold
-    letra.TextSize = 50
-    letra.TextColor3 = Color3.fromRGB(255, 255, 255)
-    letra.BackgroundTransparency = 1
-    letra.Position = UDim2.new((i - 1) / #texto, 0, 0, 0)
-    letra.Size = UDim2.new(1 / #texto, 0, 1, 0)
-    letra.TextTransparency = 1
+local barra = Instance.new("Frame", contorno)
+barra.Size = UDim2.new(0, 0, 1, 0)
+barra.BackgroundColor3 = Color3.fromRGB(150, 0, 255)
+Instance.new("UICorner", barra).CornerRadius = UDim.new(0, 10)
 
-    local tween = TweenService:Create(letra, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, false, (i - 1) * 0.05), {TextTransparency = 0})
-    tween:Play()
+-- Texto animado (letras independentes, fonte grossa)
+local textoOriginal = "Jogoroblox HUB"
+local letras = {}
+
+local baseX = 0.5 - (#textoOriginal * 0.012)
+for i = 1, #textoOriginal do
+    local letra = textoOriginal:sub(i,i)
+    local letraLbl = Instance.new("TextLabel", fundo)
+    letraLbl.Text = letra
+    letraLbl.Size = UDim2.new(0, 25, 0, 55)
+    letraLbl.Position = UDim2.new(baseX + (i-1)*0.024, 0, 0.39, 0)
+    letraLbl.BackgroundTransparency = 1
+    letraLbl.Font = Enum.Font.GothamBold
+    letraLbl.TextColor3 = Color3.new(1, 1, 1)
+    letraLbl.TextScaled = true
+    letraLbl.Name = "Letra_"..i
+    table.insert(letras, letraLbl)
+
+    local info = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    local props = {
+        Position = letraLbl.Position - UDim2.new(0, 0, 0, 8),
+        Rotation = letra == "J" and 360 or 0
+    }
+    local anim = TweenService:Create(letraLbl, info, props)
+    task.delay(0.05 * i, function()
+        anim:Play()
+    end)
 end
 
-local barraFundo = Instance.new("Frame", fundo)
-barraFundo.Position = UDim2.new(0.5, -150, 0.55, 0)
-barraFundo.Size = UDim2.new(0, 300, 0, 20)
-barraFundo.BackgroundColor3 = Color3.fromRGB(60, 0, 90)
-barraFundo.BorderSizePixel = 0
-barraFundo.BackgroundTransparency = 0
-barraFundo.ClipsDescendants = true
-barraFundo.AnchorPoint = Vector2.new(0.5, 0.5)
-barraFundo.BorderColor3 = Color3.fromRGB(255, 0, 255)
-barraFundo.BorderSizePixel = 2
+-- Encher barra
+for i = 1, 100 do
+    barra.Size = UDim2.new(i / 100, 0, 1, 0)
+    wait(0.01)
+end
 
-local barra = Instance.new("Frame", barraFundo)
-barra.BackgroundColor3 = Color3.fromRGB(160, 64, 255)
-barra.Size = UDim2.new(0, 0, 1, 0)
-barra.BorderSizePixel = 0
+-- Reduzir barra para campo
+wait(0.5)
+local reduzir = TweenService:Create(contorno, TweenInfo.new(0.5), {
+    Size = UDim2.new(0.3, 0, 0, 35),
+    Position = UDim2.new(0.35, 0, 0.5, 0)
+})
+reduzir:Play()
+reduzir.Completed:Wait()
+barra:Destroy()
 
--- Animação da barra
-local tween = TweenService:Create(barra, TweenInfo.new(4, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), {Size = UDim2.new(1, 0, 1, 0)})
-tween:Play()
+-- Campo de digitar
+local caixa = Instance.new("TextBox", contorno)
+caixa.Size = UDim2.new(1, 0, 1, 0)
+caixa.Position = UDim2.new(0, 0, 0, 0)
+caixa.BackgroundColor3 = Color3.fromRGB(150, 0, 255)
+caixa.PlaceholderText = "Digite a Key"
+caixa.Text = ""
+caixa.TextColor3 = Color3.new(1, 1, 1)
+caixa.Font = Enum.Font.Gotham
+caixa.TextScaled = true
+Instance.new("UICorner", caixa).CornerRadius = UDim.new(0, 10)
 
--- Após terminar, remover (pode conectar com a key)
-task.delay(5, function()
-    tela:Destroy()
+-- Botão verificar
+local botao = Instance.new("TextButton", fundo)
+botao.Text = "Verificar"
+botao.Size = UDim2.new(0, 150, 0, 35)
+botao.Position = UDim2.new(0.5, -75, 0.5, 50)
+botao.BackgroundColor3 = Color3.fromRGB(100, 0, 180)
+botao.TextColor3 = Color3.new(1, 1, 1)
+botao.Font = Enum.Font.GothamBold
+botao.TextScaled = true
+Instance.new("UICorner", botao).CornerRadius = UDim.new(0, 8)
+
+-- Verificação
+local keyCorreta = "jogoroblox123"
+botao.MouseButton1Click:Connect(function()
+    if caixa.Text == keyCorreta then
+        gui:Destroy()
+        -- Carrega menu
+    else
+        caixa.Text = ""
+        caixa.PlaceholderText = "Key incorreta!"
+    end
 end)
