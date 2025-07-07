@@ -1,67 +1,58 @@
 
--- Tela de carregamento do Jogoroblox HUB com texto animado a partir da metade do carregamento
-
+-- Tela de carregamento com animação antiga (texto animado letra por letra)
 local TweenService = game:GetService("TweenService")
 local CoreGui = game:GetService("CoreGui")
 
--- Criar a interface principal
 local tela = Instance.new("ScreenGui", CoreGui)
-tela.Name = "JogorobloxCarregamento"
-tela.ResetOnSpawn = false
+tela.Name = "JogorobloxLoading"
 
 local fundo = Instance.new("Frame", tela)
 fundo.BackgroundColor3 = Color3.new(0, 0, 0)
 fundo.Size = UDim2.new(1, 0, 1, 0)
-fundo.Position = UDim2.new(0, 0, 0, 0)
-fundo.BorderSizePixel = 0
 
--- Barra de carregamento
-local barra = Instance.new("Frame", fundo)
-barra.BackgroundColor3 = Color3.fromRGB(60, 0, 120)
-barra.Size = UDim2.new(0.3, 0, 0.03, 0)
-barra.Position = UDim2.new(0.5, 0, 0.65, 0)
-barra.AnchorPoint = Vector2.new(0.5, 0.5)
+local textoContainer = Instance.new("Frame", fundo)
+textoContainer.BackgroundTransparency = 1
+textoContainer.Position = UDim2.new(0.5, 0, 0.4, 0)
+textoContainer.AnchorPoint = Vector2.new(0.5, 0.5)
+textoContainer.Size = UDim2.new(0, 600, 0, 60)
+
+local texto = "Jogoroblox HUB"
+for i = 1, #texto do
+    local letra = Instance.new("TextLabel", textoContainer)
+    letra.Text = texto:sub(i, i)
+    letra.Font = Enum.Font.GothamBold
+    letra.TextSize = 50
+    letra.TextColor3 = Color3.fromRGB(255, 255, 255)
+    letra.BackgroundTransparency = 1
+    letra.Position = UDim2.new((i - 1) / #texto, 0, 0, 0)
+    letra.Size = UDim2.new(1 / #texto, 0, 1, 0)
+    letra.TextTransparency = 1
+
+    local tween = TweenService:Create(letra, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, false, (i - 1) * 0.05), {TextTransparency = 0})
+    tween:Play()
+end
+
+local barraFundo = Instance.new("Frame", fundo)
+barraFundo.Position = UDim2.new(0.5, -150, 0.55, 0)
+barraFundo.Size = UDim2.new(0, 300, 0, 20)
+barraFundo.BackgroundColor3 = Color3.fromRGB(60, 0, 90)
+barraFundo.BorderSizePixel = 0
+barraFundo.BackgroundTransparency = 0
+barraFundo.ClipsDescendants = true
+barraFundo.AnchorPoint = Vector2.new(0.5, 0.5)
+barraFundo.BorderColor3 = Color3.fromRGB(255, 0, 255)
+barraFundo.BorderSizePixel = 2
+
+local barra = Instance.new("Frame", barraFundo)
+barra.BackgroundColor3 = Color3.fromRGB(160, 64, 255)
+barra.Size = UDim2.new(0, 0, 1, 0)
 barra.BorderSizePixel = 0
-barra.BackgroundColor3 = Color3.fromRGB(80, 0, 180)
-barra.BorderColor3 = Color3.fromRGB(180, 0, 255)
-barra.BorderMode = Enum.BorderMode.Outline
-
-local uicorner = Instance.new("UICorner", barra)
-uicorner.CornerRadius = UDim.new(0, 25)
-
-local progresso = Instance.new("Frame", barra)
-progresso.BackgroundColor3 = Color3.fromRGB(180, 0, 255)
-progresso.Size = UDim2.new(0, 0, 1, 0)
-progresso.Position = UDim2.new(0, 0, 0, 0)
-progresso.BorderSizePixel = 0
-Instance.new("UICorner", progresso).CornerRadius = UDim.new(0, 25)
-
--- Texto do hub (centralizado acima da barra)
-local texto = Instance.new("TextLabel", fundo)
-texto.Text = ""
-texto.Font = Enum.Font.GothamBold
-texto.TextColor3 = Color3.new(1, 1, 1)
-texto.TextScaled = true
-texto.Size = UDim2.new(0.6, 0, 0.1, 0)
-texto.Position = UDim2.new(0.2, 0, 0.52, 0)
-texto.BackgroundTransparency = 1
 
 -- Animação da barra
-local progressoTween = TweenService:Create(progresso, TweenInfo.new(5, Enum.EasingStyle.Linear), {Size = UDim2.new(1, 0, 1, 0)})
-progressoTween:Play()
+local tween = TweenService:Create(barra, TweenInfo.new(4, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), {Size = UDim2.new(1, 0, 1, 0)})
+tween:Play()
 
--- Ativar animação do texto na metade
-task.spawn(function()
-	wait(2.5)  -- metade do tempo do tween
-	local frase = "Jogoroblox HUB"
-	for i = 1, #frase do
-		texto.Text = string.sub(frase, 1, i)
-		wait(0.05)
-	end
-end)
-
--- Remover a tela após animação
-task.spawn(function()
-	wait(6)
-	tela:Destroy()
+-- Após terminar, remover (pode conectar com a key)
+task.delay(5, function()
+    tela:Destroy()
 end)
