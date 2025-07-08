@@ -23,7 +23,7 @@ barra.Size = UDim2.new(0, 0, 1, 0)
 barra.BackgroundColor3 = Color3.fromRGB(150, 0, 255)
 Instance.new("UICorner", barra).CornerRadius = UDim.new(0, 10)
 
--- Texto animado (letras independentes, fonte premium)
+-- Texto animado (letras independentes)
 local textoOriginal = "Jogoroblox HUB"
 local letras = {}
 
@@ -37,21 +37,41 @@ local function iniciarAnimacaoTexto()
         letraLbl.Size = UDim2.new(0, 25, 0, 55)
         letraLbl.Position = UDim2.new(baseX + (i-1)*0.024, 0, 0.39, 0)
         letraLbl.BackgroundTransparency = 1
-        letraLbl.Font = Enum.Font.FredokaOne -- Fonte mais bonita
+        letraLbl.Font = Enum.Font.FredokaOne
         letraLbl.TextColor3 = Color3.new(1, 1, 1)
         letraLbl.TextScaled = true
         letraLbl.Name = "Letra_"..i
         table.insert(letras, letraLbl)
 
-        local info = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-        local props = {
-            Position = letraLbl.Position - UDim2.new(0, 0, 0, 8),
-            Rotation = letra == "J" and 360 or 0,
-            TextColor3 = Color3.fromRGB(150, 0, 255) -- Efeito de cor
+        -- Animação de movimento (sem rotação)
+        local infoMovimento = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+        local propsMovimento = {
+            Position = letraLbl.Position - UDim2.new(0, 0, 0, 8)
         }
-        local anim = TweenService:Create(letraLbl, info, props)
+        local animMovimento = TweenService:Create(letraLbl, infoMovimento, propsMovimento)
+        
+        -- Animação de cor (ida e volta)
+        local infoCor = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut)
+        local propsCorIn = {
+            TextColor3 = Color3.fromRGB(150, 0, 255)
+        }
+        local propsCorOut = {
+            TextColor3 = Color3.new(1, 1, 1)
+        }
+        
         task.delay(0.05 * i, function()
-            anim:Play()
+            -- Executa animação de movimento
+            animMovimento:Play()
+            
+            -- Animação de cor (entrada)
+            local animCorIn = TweenService:Create(letraLbl, infoCor, propsCorIn)
+            animCorIn:Play()
+            
+            -- Animação de cor (volta) após 0.5 segundos
+            task.delay(0.5, function()
+                local animCorOut = TweenService:Create(letraLbl, infoCor, propsCorOut)
+                animCorOut:Play()
+            end)
         end)
     end
 end
@@ -70,6 +90,7 @@ for i = 1, 100 do
     task.wait(0.01)
 end
 
+-- Resto do código permanece igual...
 -- Reduzir barra para campo
 task.wait(0.5)
 local reduzir = TweenService:Create(contorno, TweenInfo.new(0.5), {
@@ -88,7 +109,7 @@ caixa.BackgroundColor3 = Color3.fromRGB(150, 0, 255)
 caixa.PlaceholderText = "Digite a Key"
 caixa.Text = ""
 caixa.TextColor3 = Color3.new(1, 1, 1)
-caixa.Font = Enum.Font.FredokaOne -- Fonte mais bonita
+caixa.Font = Enum.Font.FredokaOne
 caixa.TextScaled = true
 Instance.new("UICorner", caixa).CornerRadius = UDim.new(0, 10)
 
@@ -99,7 +120,7 @@ botao.Size = UDim2.new(0, 150, 0, 35)
 botao.Position = UDim2.new(0.5, -75, 0.5, 50)
 botao.BackgroundColor3 = Color3.fromRGB(100, 0, 180)
 botao.TextColor3 = Color3.new(1, 1, 1)
-botao.Font = Enum.Font.FredokaOne -- Fonte mais bonita
+botao.Font = Enum.Font.FredokaOne
 botao.TextScaled = true
 Instance.new("UICorner", botao).CornerRadius = UDim.new(0, 8)
 
