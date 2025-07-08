@@ -1,5 +1,4 @@
 
--- Jogoroblox HUB - Menu Principal
 local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
 
@@ -8,7 +7,7 @@ local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
 gui.Name = "JogorobloxMenu"
 gui.ResetOnSpawn = false
 
--- Fundo do Menu (quase toda a tela)
+-- Fundo do Menu com bordas arredondadas e centralizado
 local fundo = Instance.new("Frame", gui)
 fundo.Name = "FundoMenu"
 fundo.Size = UDim2.new(0.85, 0, 0.85, 0)
@@ -16,7 +15,7 @@ fundo.AnchorPoint = Vector2.new(0.5, 0.5)
 fundo.Position = UDim2.new(0.5, 0, 0.5, 0)
 fundo.BackgroundColor3 = Color3.new(0, 0, 0)
 fundo.BorderSizePixel = 0
-fundo.AnchorPoint = Vector2.new(0.5, 0.5)
+Instance.new("UICorner", fundo).CornerRadius = UDim.new(0, 20)
 
 -- Layout de Abas (coluna vertical à esquerda)
 local abasLayout = Instance.new("Frame", fundo)
@@ -34,7 +33,7 @@ local tituloLayout = Instance.new("Frame", fundo)
 tituloLayout.Name = "LayoutTitulo"
 tituloLayout.Size = UDim2.new(0.2, 0, 0.1, 0)
 tituloLayout.Position = UDim2.new(0, 0, -0.1, 0)
-tituloLayout.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+tituloLayout.BackgroundColor3 = Color3.fromRGB(120, 0, 180)
 
 local titulo = Instance.new("TextLabel", tituloLayout)
 titulo.Name = "TituloHub"
@@ -43,7 +42,7 @@ titulo.Position = UDim2.new(0, 0, 0, 0)
 titulo.BackgroundTransparency = 1
 titulo.Text = "Jogoroblox HUB"
 titulo.TextColor3 = Color3.fromRGB(255, 255, 255)
-titulo.Font = Enum.Font.GothamBold
+titulo.Font = Enum.Font.GothamBlack
 titulo.TextScaled = true
 
 -- Área para botões dinâmicos (direita)
@@ -53,24 +52,26 @@ botoesArea.Size = UDim2.new(0.8, 0, 1, 0)
 botoesArea.Position = UDim2.new(0.2, 0, 0, 0)
 botoesArea.BackgroundTransparency = 1
 
--- UIList para botões dinâmicos
 local botoesList = Instance.new("UIListLayout", botoesArea)
 botoesList.SortOrder = Enum.SortOrder.LayoutOrder
 botoesList.Padding = UDim.new(0, 6)
 
 -- Função para criar botões da aba
 local function criarBotoes(nome)
-    botoesArea:ClearAllChildren()
-    botoesList.Parent = botoesArea
+    for _, child in ipairs(botoesArea:GetChildren()) do
+        if child:IsA("TextButton") then
+            child:Destroy()
+        end
+    end
     for i = 1, 5 do
         local botao = Instance.new("TextButton", botoesArea)
-        botao.Size = UDim2.new(0.9, 0, 0, 40)
-        botao.BackgroundColor3 = Color3.fromRGB(180, 100, 255)
+        botao.Size = UDim2.new(0.8, 0, 0, 35)
+        botao.BackgroundColor3 = Color3.fromRGB(100, 0, 160)
         botao.Text = nome .. " Opção " .. i
         botao.Font = Enum.Font.Gotham
         botao.TextColor3 = Color3.fromRGB(255, 255, 255)
         botao.TextScaled = true
-        Instance.new("UICorner", botao).CornerRadius = UDim.new(0, 6)
+        Instance.new("UICorner", botao).CornerRadius = UDim.new(0, 8)
     end
 end
 
@@ -80,7 +81,7 @@ local nomesAbas = {"Entrada", "Casas", "Carros", "Avatar", "Fun"}
 for _, nome in ipairs(nomesAbas) do
     local aba = Instance.new("TextButton", abasLayout)
     aba.Size = UDim2.new(1, 0, 0, 40)
-    aba.BackgroundColor3 = Color3.fromRGB(180, 100, 255)
+    aba.BackgroundColor3 = Color3.fromRGB(100, 0, 160)
     aba.Text = nome
     aba.Font = Enum.Font.Gotham
     aba.TextColor3 = Color3.fromRGB(255, 255, 255)
