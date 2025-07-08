@@ -1,4 +1,4 @@
--- Jogoroblox HUB - Tela de carregamento com texto estático idêntico ao animado
+-- Jogoroblox HUB - Tela de carregamento melhorada
 local TweenService = game:GetService("TweenService")
 local TextService = game:GetService("TextService")
 
@@ -23,37 +23,21 @@ barra.Size = UDim2.new(0, 0, 1, 0)
 barra.BackgroundColor3 = Color3.fromRGB(150, 0, 255)
 Instance.new("UICorner", barra).CornerRadius = UDim.new(0, 10)
 
--- Configurações compartilhadas
+-- Texto animado (letras independentes, fonte premium)
 local textoOriginal = "Jogoroblox HUB"
-local baseX = 0.5 - (#textoOriginal * 0.014)
 local letras = {}
 
--- Texto estático (com as MESMAS configurações do animado)
-local textoStatic = Instance.new("TextLabel", fundo)
-textoStatic.Text = textoOriginal
-textoStatic.Size = UDim2.new(0, #textoOriginal * 25, 0, 55) -- Largura proporcional ao texto
-textoStatic.Position = UDim2.new(baseX, 0, 0.39, 0) -- Mesma posição base
-textoStatic.AnchorPoint = Vector2.new(0, 0)
-textoStatic.BackgroundTransparency = 1
-textoStatic.Font = Enum.Font.FredokaOne
-textoStatic.TextColor3 = Color3.new(1, 1, 1)
-textoStatic.TextScaled = true
-textoStatic.TextXAlignment = Enum.TextXAlignment.Left -- Alinhamento para coincidir com as letras individuais
-textoStatic.Name = "TextoStatico"
-
+-- Função para iniciar animação do texto
 local function iniciarAnimacaoTexto()
-    -- Remove o texto estático
-    textoStatic:Destroy()
-    
-    -- Cria as letras animadas (configurações idênticas ao estático)
+    local baseX = 0.5 - (#textoOriginal * 0.012)
     for i = 1, #textoOriginal do
         local letra = textoOriginal:sub(i,i)
         local letraLbl = Instance.new("TextLabel", fundo)
         letraLbl.Text = letra
         letraLbl.Size = UDim2.new(0, 25, 0, 55)
-        letraLbl.Position = UDim2.new(baseX + (i-1)*0.028, 0, 0.39, 0)
+        letraLbl.Position = UDim2.new(baseX + (i-1)*0.024, 0, 0.39, 0)
         letraLbl.BackgroundTransparency = 1
-        letraLbl.Font = Enum.Font.FredokaOne
+        letraLbl.Font = Enum.Font.FredokaOne -- Fonte mais bonita
         letraLbl.TextColor3 = Color3.new(1, 1, 1)
         letraLbl.TextScaled = true
         letraLbl.Name = "Letra_"..i
@@ -63,32 +47,21 @@ local function iniciarAnimacaoTexto()
         local props = {
             Position = letraLbl.Position - UDim2.new(0, 0, 0, 8),
             Rotation = letra == "J" and 360 or 0,
-            TextColor3 = Color3.fromRGB(150, 0, 255)
+            TextColor3 = Color3.fromRGB(150, 0, 255) -- Efeito de cor
         }
-        
         local anim = TweenService:Create(letraLbl, info, props)
-        
-        local infoVolta = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-        local propsVolta = {
-            TextColor3 = Color3.new(1, 1, 1)
-        }
-        
         task.delay(0.05 * i, function()
             anim:Play()
-            
-            task.delay(0.5, function()
-                local animVolta = TweenService:Create(letraLbl, infoVolta, propsVolta)
-                animVolta:Play()
-            end)
         end)
     end
 end
 
--- Barra de carregamento
+-- Encher barra com trigger aos 50%
 local animacaoIniciada = false
 for i = 1, 100 do
     barra.Size = UDim2.new(i / 100, 0, 1, 0)
     
+    -- Inicia animação quando chegar em 50%
     if i >= 50 and not animacaoIniciada then
         animacaoIniciada = true
         iniciarAnimacaoTexto()
@@ -97,7 +70,6 @@ for i = 1, 100 do
     task.wait(0.01)
 end
 
--- Resto do código permanece igual...
 -- Reduzir barra para campo
 task.wait(0.5)
 local reduzir = TweenService:Create(contorno, TweenInfo.new(0.5), {
@@ -116,7 +88,7 @@ caixa.BackgroundColor3 = Color3.fromRGB(150, 0, 255)
 caixa.PlaceholderText = "Digite a Key"
 caixa.Text = ""
 caixa.TextColor3 = Color3.new(1, 1, 1)
-caixa.Font = Enum.Font.FredokaOne
+caixa.Font = Enum.Font.FredokaOne -- Fonte mais bonita
 caixa.TextScaled = true
 Instance.new("UICorner", caixa).CornerRadius = UDim.new(0, 10)
 
@@ -127,7 +99,7 @@ botao.Size = UDim2.new(0, 150, 0, 35)
 botao.Position = UDim2.new(0.5, -75, 0.5, 50)
 botao.BackgroundColor3 = Color3.fromRGB(100, 0, 180)
 botao.TextColor3 = Color3.new(1, 1, 1)
-botao.Font = Enum.Font.FredokaOne
+botao.Font = Enum.Font.FredokaOne -- Fonte mais bonita
 botao.TextScaled = true
 Instance.new("UICorner", botao).CornerRadius = UDim.new(0, 8)
 
@@ -136,6 +108,8 @@ local keyCorreta = "jogoroblox123"
 botao.MouseButton1Click:Connect(function()
     if caixa.Text == keyCorreta then
         gui:Destroy()
+
+loadstring(game:HttpGet("https://raw.githubusercontent.com/rubzinbr/jogorobloxhub/main/menu.lua"))()
         -- Carrega menu
     else
         caixa.Text = ""
