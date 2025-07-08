@@ -1,4 +1,4 @@
--- Jogoroblox HUB - Tela de carregamento melhorada
+-- Jogoroblox HUB - Tela de carregamento com animação personalizada
 local TweenService = game:GetService("TweenService")
 local TextService = game:GetService("TextService")
 
@@ -23,19 +23,20 @@ barra.Size = UDim2.new(0, 0, 1, 0)
 barra.BackgroundColor3 = Color3.fromRGB(150, 0, 255)
 Instance.new("UICorner", barra).CornerRadius = UDim.new(0, 10)
 
--- Texto animado (letras independentes)
+-- Texto animado com espaçamento ajustado
 local textoOriginal = "Jogoroblox HUB"
 local letras = {}
 
 -- Função para iniciar animação do texto
 local function iniciarAnimacaoTexto()
-    local baseX = 0.5 - (#textoOriginal * 0.012)
+    -- Aumentei o espaçamento multiplicando por 0.028 em vez de 0.024
+    local baseX = 0.5 - (#textoOriginal * 0.014) -- Ajuste para centralizar com novo espaçamento
     for i = 1, #textoOriginal do
         local letra = textoOriginal:sub(i,i)
         local letraLbl = Instance.new("TextLabel", fundo)
         letraLbl.Text = letra
         letraLbl.Size = UDim2.new(0, 25, 0, 55)
-        letraLbl.Position = UDim2.new(baseX + (i-1)*0.024, 0, 0.39, 0)
+        letraLbl.Position = UDim2.new(baseX + (i-1)*0.028, 0, 0.39, 0) -- Espaçamento aumentado
         letraLbl.BackgroundTransparency = 1
         letraLbl.Font = Enum.Font.FredokaOne
         letraLbl.TextColor3 = Color3.new(1, 1, 1)
@@ -43,45 +44,41 @@ local function iniciarAnimacaoTexto()
         letraLbl.Name = "Letra_"..i
         table.insert(letras, letraLbl)
 
-        -- Animação de movimento (sem rotação)
-        local infoMovimento = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-        local propsMovimento = {
-            Position = letraLbl.Position - UDim2.new(0, 0, 0, 8)
-        }
-        local animMovimento = TweenService:Create(letraLbl, infoMovimento, propsMovimento)
-        
-        -- Animação de cor (ida e volta)
-        local infoCor = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut)
-        local propsCorIn = {
+        -- Configurações de animação
+        local info = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+        local props = {
+            Position = letraLbl.Position - UDim2.new(0, 0, 0, 8),
+            -- Aplica rotação apenas na letra "J"
+            Rotation = letra == "J" and 360 or 0,
             TextColor3 = Color3.fromRGB(150, 0, 255)
         }
-        local propsCorOut = {
+        
+        local anim = TweenService:Create(letraLbl, info, props)
+        
+        -- Animação de volta para cor branca
+        local infoVolta = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+        local propsVolta = {
             TextColor3 = Color3.new(1, 1, 1)
         }
         
         task.delay(0.05 * i, function()
-            -- Executa animação de movimento
-            animMovimento:Play()
+            anim:Play()
             
-            -- Animação de cor (entrada)
-            local animCorIn = TweenService:Create(letraLbl, infoCor, propsCorIn)
-            animCorIn:Play()
-            
-            -- Animação de cor (volta) após 0.5 segundos
+            -- Animação de volta para branco após 0.5 segundos
             task.delay(0.5, function()
-                local animCorOut = TweenService:Create(letraLbl, infoCor, propsCorOut)
-                animCorOut:Play()
+                local animVolta = TweenService:Create(letraLbl, infoVolta, propsVolta)
+                animVolta:Play()
             end)
         end)
     end
 end
 
+-- Resto do código permanece igual...
 -- Encher barra com trigger aos 50%
 local animacaoIniciada = false
 for i = 1, 100 do
     barra.Size = UDim2.new(i / 100, 0, 1, 0)
     
-    -- Inicia animação quando chegar em 50%
     if i >= 50 and not animacaoIniciada then
         animacaoIniciada = true
         iniciarAnimacaoTexto()
@@ -90,7 +87,6 @@ for i = 1, 100 do
     task.wait(0.01)
 end
 
--- Resto do código permanece igual...
 -- Reduzir barra para campo
 task.wait(0.5)
 local reduzir = TweenService:Create(contorno, TweenInfo.new(0.5), {
