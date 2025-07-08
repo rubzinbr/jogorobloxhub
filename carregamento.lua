@@ -1,4 +1,4 @@
--- Jogoroblox HUB - Tela de carregamento com texto estático e animado
+-- Jogoroblox HUB - Tela de carregamento com texto estático idêntico ao animado
 local TweenService = game:GetService("TweenService")
 local TextService = game:GetService("TextService")
 
@@ -23,27 +23,29 @@ barra.Size = UDim2.new(0, 0, 1, 0)
 barra.BackgroundColor3 = Color3.fromRGB(150, 0, 255)
 Instance.new("UICorner", barra).CornerRadius = UDim.new(0, 10)
 
--- Texto estático (aparece antes da animação)
+-- Configurações compartilhadas
+local textoOriginal = "Jogoroblox HUB"
+local baseX = 0.5 - (#textoOriginal * 0.014)
+local letras = {}
+
+-- Texto estático (com as MESMAS configurações do animado)
 local textoStatic = Instance.new("TextLabel", fundo)
-textoStatic.Text = "Jogoroblox HUB"
-textoStatic.Size = UDim2.new(0, 200, 0, 55)
-textoStatic.Position = UDim2.new(0.5, -100, 0.39, 0)
+textoStatic.Text = textoOriginal
+textoStatic.Size = UDim2.new(0, #textoOriginal * 25, 0, 55) -- Largura proporcional ao texto
+textoStatic.Position = UDim2.new(baseX, 0, 0.39, 0) -- Mesma posição base
+textoStatic.AnchorPoint = Vector2.new(0, 0)
 textoStatic.BackgroundTransparency = 1
 textoStatic.Font = Enum.Font.FredokaOne
 textoStatic.TextColor3 = Color3.new(1, 1, 1)
 textoStatic.TextScaled = true
+textoStatic.TextXAlignment = Enum.TextXAlignment.Left -- Alinhamento para coincidir com as letras individuais
 textoStatic.Name = "TextoStatico"
-
--- Texto animado (aparece quando a barra chega em 50%)
-local textoOriginal = "Jogoroblox HUB"
-local letras = {}
 
 local function iniciarAnimacaoTexto()
     -- Remove o texto estático
     textoStatic:Destroy()
     
-    -- Cria as letras animadas
-    local baseX = 0.5 - (#textoOriginal * 0.014)
+    -- Cria as letras animadas (configurações idênticas ao estático)
     for i = 1, #textoOriginal do
         local letra = textoOriginal:sub(i,i)
         local letraLbl = Instance.new("TextLabel", fundo)
@@ -95,6 +97,7 @@ for i = 1, 100 do
     task.wait(0.01)
 end
 
+-- Resto do código permanece igual...
 -- Reduzir barra para campo
 task.wait(0.5)
 local reduzir = TweenService:Create(contorno, TweenInfo.new(0.5), {
