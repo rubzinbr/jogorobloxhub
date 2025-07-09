@@ -72,11 +72,14 @@ closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 closeBtn.BackgroundColor3 = Color3.fromRGB(100, 0, 150)
 closeBtn.BorderSizePixel = 0
 closeBtn.AutoButtonColor = true
+
+-- Adicionar borda arredondada ao botão de fechar
+local closeBtnCorner = Instance.new("UICorner", closeBtn)
+closeBtnCorner.CornerRadius = UDim.new(0, 6)
+
 closeBtn.MouseButton1Click:Connect(function()
     screenGui:Destroy()
 end)
-
--- [CONTINUE COM O RESTO DO SEU CÓDIGO ORIGINAL, GARANTINDO QUE TODOS OS ELEMENTOS VISÍVEIS SEJAM FILHOS DE mainFrame]
 
 -- Ícone e nome do usuário
 local user = Instance.new("TextLabel", mainFrame)
@@ -195,6 +198,11 @@ local function switchTab(tab)
         b.BackgroundTransparency = 0
         b.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
         b.AutoButtonColor = true
+        
+        -- Adicionar borda arredondada ao botão de conteúdo
+        local buttonCorner = Instance.new("UICorner", b)
+        buttonCorner.CornerRadius = UDim.new(0, 6)
+        
         b.MouseEnter:Connect(function()
             TweenService:Create(b, hoverTweenInfo, {
                 BackgroundColor3 = Color3.fromRGB(150, 0, 220)
@@ -219,6 +227,11 @@ for _, name in ipairs(tabs) do
     tabBtn.BackgroundColor3 = Color3.fromRGB(120, 0, 180)
     tabBtn.BorderSizePixel = 0
     tabBtn.AutoButtonColor = true
+    
+    -- Adicionar borda arredondada aos botões das abas
+    local tabButtonCorner = Instance.new("UICorner", tabBtn)
+    tabButtonCorner.CornerRadius = UDim.new(0, 6)
+    
     tabButtons[name] = tabBtn
     
     -- Configurar efeito hover
