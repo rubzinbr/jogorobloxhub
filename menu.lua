@@ -1,134 +1,233 @@
+-- Jogoroblox HUB - Interface Estilo Dashboard sem Rayfield
+local player = game.Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+local TweenService = game:GetService("TweenService")
 
--- Jogoroblox HUB - Estilo Dashboard (sem Rayfield)
-local Players = game:GetService("Players")
-local player = Players.LocalPlayer
+-- Remover menu antigo (se houver)
+if playerGui:FindFirstChild("JogorobloxMenu") then
+    playerGui.JogorobloxMenu:Destroy()
+end
 
--- Interface principal
-local gui = Instance.new("ScreenGui", game:GetService("CoreGui"))
-gui.Name = "JogorobloxInterface"
+-- Criar ScreenGui
+local screenGui = Instance.new("ScreenGui", playerGui)
+screenGui.Name = "JogorobloxMenu"
+screenGui.ResetOnSpawn = false
 
-local main = Instance.new("Frame", gui)
-main.Name = "MainMenu"
-main.AnchorPoint = Vector2.new(0.5, 0.5)
-main.Position = UDim2.new(0.5, 0, 0.5, 0)
-main.Size = UDim2.new(0, 500, 0, 300)
-main.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-main.BackgroundTransparency = 0.2
-main.BorderSizePixel = 0
-main.ClipsDescendants = true
+-- Frame principal que será arrastado (deve conter TODOS os elementos visíveis)
+local dragFrame = Instance.new("Frame", screenGui)
+dragFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+dragFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+dragFrame.Size = UDim2.new(0, 600, 0, 350)
+dragFrame.BackgroundTransparency = 1  -- Invisível, só serve para agrupar
+dragFrame.Name = "DragFrame"
+dragFrame.Active = true
+dragFrame.Draggable = true
+dragFrame.Selectable = true
 
-local corner = Instance.new("UICorner", main)
-corner.CornerRadius = UDim.new(0, 12)
+-- Container com bordas arredondadas (filho do dragFrame)
+local mainContainer = Instance.new("Frame", dragFrame)
+mainContainer.Size = UDim2.new(1, 0, 1, 0)
+mainContainer.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Fundo preto sólido
+mainContainer.BackgroundTransparency = 0
+mainContainer.ClipsDescendants = true
 
--- Botão de fechar
-local close = Instance.new("TextButton", main)
-close.Text = "X"
-close.Size = UDim2.new(0, 30, 0, 30)
-close.Position = UDim2.new(1, -35, 0, 5)
-close.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-close.TextColor3 = Color3.new(1, 1, 1)
-close.AutoButtonColor = true
-close.MouseButton1Click:Connect(function()
-	gui:Destroy()
+-- Adicionar bordas arredondadas ao container
+local uiCorner = Instance.new("UICorner", mainContainer)
+uiCorner.CornerRadius = UDim.new(0, 8) -- Bordas arredondadas
+
+-- Janela principal (dentro do container)
+local mainFrame = Instance.new("Frame", mainContainer)
+mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+mainFrame.Size = UDim2.new(1, -10, 1, -10) -- Margem interna de 5px
+mainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+mainFrame.BackgroundTransparency = 0.3
+mainFrame.BorderSizePixel = 0
+mainFrame.ClipsDescendants = true
+mainFrame.Name = "MainFrame"
+
+-- Bordas arredondadas para a janela principal
+local mainFrameCorner = Instance.new("UICorner", mainFrame)
+mainFrameCorner.CornerRadius = UDim.new(0, 6)
+
+-- Título (filho de mainFrame)
+local title = Instance.new("TextLabel", mainFrame)
+title.Size = UDim2.new(1, -50, 0, 40)
+title.Position = UDim2.new(0, 10, 0, 10)
+title.Text = "Jogoroblox HUB"
+title.TextSize = 28
+title.Font = Enum.Font.GothamBold
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.BackgroundTransparency = 1
+title.TextXAlignment = Enum.TextXAlignment.Left
+
+-- Botão de fechar (filho de mainFrame)
+local closeBtn = Instance.new("TextButton", mainFrame)
+closeBtn.Size = UDim2.new(0, 30, 0, 30)
+closeBtn.Position = UDim2.new(1, -35, 0, 10)
+closeBtn.Text = "X"
+closeBtn.Font = Enum.Font.Gotham
+closeBtn.TextSize = 20
+closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeBtn.BackgroundColor3 = Color3.fromRGB(100, 0, 150)
+closeBtn.BorderSizePixel = 0
+closeBtn.AutoButtonColor = true
+closeBtn.MouseButton1Click:Connect(function()
+    screenGui:Destroy()
 end)
 
-local corner2 = Instance.new("UICorner", close)
-corner2.CornerRadius = UDim.new(1, 0)
+-- [CONTINUE COM O RESTO DO SEU CÓDIGO ORIGINAL, GARANTINDO QUE TODOS OS ELEMENTOS VISÍVEIS SEJAM FILHOS DE mainFrame]
 
--- Painel esquerdo (Abas)
-local sidebar = Instance.new("Frame", main)
-sidebar.Size = UDim2.new(0, 120, 1, 0)
-sidebar.Position = UDim2.new(0, 0, 0, 0)
-sidebar.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-sidebar.BorderSizePixel = 0
+-- Ícone e nome do usuário
+local user = Instance.new("TextLabel", mainFrame)
+user.Position = UDim2.new(0, 10, 1, -30)
+user.Size = UDim2.new(1, -20, 0, 20)
+user.Text = player.Name
+user.Font = Enum.Font.Gotham
+user.TextColor3 = Color3.fromRGB(180, 180, 180)
+user.BackgroundTransparency = 1
+user.TextSize = 14
+user.TextXAlignment = Enum.TextXAlignment.Left
 
-local corner3 = Instance.new("UICorner", sidebar)
-corner3.CornerRadius = UDim.new(0, 10)
+-- Abas
+local tabs = {"Entrada", "Casas", "Carros", "Avatar", "Fun"}
+local tabButtons = {}
+local selectedTab = nil
 
--- Nome do usuário e imagem
-local profile = Instance.new("Frame", sidebar)
-profile.Size = UDim2.new(1, 0, 0, 50)
-profile.Position = UDim2.new(0, 0, 1, -50)
-profile.BackgroundTransparency = 1
+-- Conteúdo dos botões
+local tabContents = {
+    Entrada = {"Início", "Login", "Status", "Sobre", "Ajuda"},
+    Casas = {"Casa 1", "Casa 2", "Casa 3", "Casa 4", "Casa 5"},
+    Carros = {"Carro 1", "Carro 2", "Carro 3", "Moto", "Bicicleta"},
+    Avatar = {"Chapéus", "Roupas", "Acessórios", "Cores", "Tamanho"},
+    Fun = {"Explosão", "Fogo", "Loop", "Speed", "Fly"}
+}
 
-local icon = Instance.new("ImageLabel", profile)
-icon.Size = UDim2.new(0, 32, 0, 32)
-icon.Position = UDim2.new(0, 10, 0.5, -16)
-icon.BackgroundTransparency = 1
-icon.Image = Players:GetUserThumbnailAsync(player.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size48x48)
+-- Layout das abas
+local tabFrame = Instance.new("Frame", mainFrame)
+tabFrame.Position = UDim2.new(0, 10, 0, 60)
+tabFrame.Size = UDim2.new(0, 140, 1, -80)
+tabFrame.BackgroundTransparency = 1
 
-local username = Instance.new("TextLabel", profile)
-username.Position = UDim2.new(0, 50, 0.5, -10)
-username.Size = UDim2.new(1, -60, 0, 20)
-username.Text = player.DisplayName
-username.TextColor3 = Color3.new(1, 1, 1)
-username.BackgroundTransparency = 1
-username.Font = Enum.Font.Gotham
-username.TextSize = 14
-username.TextXAlignment = Enum.TextXAlignment.Left
+local tabLayout = Instance.new("UIListLayout", tabFrame)
+tabLayout.Padding = UDim.new(0, 6)
 
--- Função para criar abas
-local function criarAba(nome, callback)
-	local aba = Instance.new("TextButton", sidebar)
-	aba.Size = UDim2.new(1, 0, 0, 35)
-	aba.BackgroundColor3 = Color3.fromRGB(70, 0, 140)
-	aba.Text = nome
-	aba.TextColor3 = Color3.new(1, 1, 1)
-	aba.Font = Enum.Font.Gotham
-	aba.TextSize = 14
-	aba.BorderSizePixel = 0
+-- Conteúdo de botões
+local contentFrame = Instance.new("Frame", mainFrame)
+contentFrame.Position = UDim2.new(0, 160, 0, 60)
+contentFrame.Size = UDim2.new(1, -170, 1, -80)
+contentFrame.BackgroundTransparency = 1
 
-	local uiCorner = Instance.new("UICorner", aba)
-	uiCorner.CornerRadius = UDim.new(0, 8)
+local contentLayout = Instance.new("UIListLayout", contentFrame)
+contentLayout.Padding = UDim.new(0, 6)
 
-	aba.MouseEnter:Connect(function()
-		aba.BackgroundColor3 = Color3.fromRGB(140, 0, 255)
-	end)
-	aba.MouseLeave:Connect(function()
-		aba.BackgroundColor3 = Color3.fromRGB(70, 0, 140)
-	end)
-	aba.MouseButton1Click:Connect(callback)
+-- Configurações de animação
+local hoverTweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+local defaultTweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+
+-- Função para animar botões
+local function setupButtonHoverEffect(button)
+    local defaultSize = button.Size
+    local hoverSize = UDim2.new(defaultSize.X.Scale * 1.05, defaultSize.X.Offset, 
+                              defaultSize.Y.Scale * 1.05, defaultSize.Y.Offset)
+    
+    button.MouseEnter:Connect(function()
+        -- Anima o botão hover para aumentar
+        TweenService:Create(button, hoverTweenInfo, {
+            Size = hoverSize,
+            BackgroundColor3 = Color3.fromRGB(150, 0, 220)
+        }):Play()
+        
+        -- Anima os outros botões para diminuir
+        for _, otherButton in pairs(tabButtons) do
+            if otherButton ~= button then
+                TweenService:Create(otherButton, hoverTweenInfo, {
+                    Size = UDim2.new(defaultSize.X.Scale * 0.95, defaultSize.X.Offset, 
+                                   defaultSize.Y.Scale * 0.95, defaultSize.Y.Offset),
+                    BackgroundColor3 = Color3.fromRGB(100, 0, 150)
+                }):Play()
+            end
+        end
+    end)
+    
+    button.MouseLeave:Connect(function()
+        -- Restaura todos os botões para o tamanho padrão
+        for _, otherButton in pairs(tabButtons) do
+            TweenService:Create(otherButton, defaultTweenInfo, {
+                Size = defaultSize,
+                BackgroundColor3 = (otherButton == selectedTab and Color3.fromRGB(180, 0, 255)) 
+                                  or Color3.fromRGB(120, 0, 180)
+            }):Play()
+        end
+    end)
 end
 
--- Painel de botões da direita
-local painelBotoes = Instance.new("Frame", main)
-painelBotoes.Size = UDim2.new(1, -130, 1, -10)
-painelBotoes.Position = UDim2.new(0, 130, 0, 5)
-painelBotoes.BackgroundTransparency = 1
+-- Função para trocar abas
+local function switchTab(tab)
+    selectedTab = tab
+    for _, btn in pairs(tabButtons) do
+        btn.BackgroundColor3 = Color3.fromRGB(120, 0, 180)
+    end
+    tabButtons[tab].BackgroundColor3 = Color3.fromRGB(180, 0, 255)
 
-local layout = Instance.new("UIListLayout", painelBotoes)
-layout.Padding = UDim.new(0, 6)
-layout.SortOrder = Enum.SortOrder.LayoutOrder
+    -- Limpar conteúdo
+    for _, c in ipairs(contentFrame:GetChildren()) do
+        if c:IsA("TextButton") then c:Destroy() end
+    end
 
--- Criar botões da aba
-local function mostrarBotoes(nomeAba)
-	painelBotoes:ClearAllChildren()
-	layout.Parent = painelBotoes
-	for i = 1, 5 do
-		local botao = Instance.new("TextButton", painelBotoes)
-		botao.Size = UDim2.new(1, -10, 0, 30)
-		botao.BackgroundColor3 = Color3.fromRGB(90, 0, 180)
-		botao.Text = nomeAba .. " Botão " .. i
-		botao.TextColor3 = Color3.new(1, 1, 1)
-		botao.Font = Enum.Font.Gotham
-		botao.TextSize = 14
-		botao.BorderSizePixel = 0
-
-		local bcorner = Instance.new("UICorner", botao)
-		bcorner.CornerRadius = UDim.new(0, 6)
-
-		botao.MouseEnter:Connect(function()
-			botao.BackgroundColor3 = Color3.fromRGB(140, 0, 255)
-		end)
-		botao.MouseLeave:Connect(function()
-			botao.BackgroundColor3 = Color3.fromRGB(90, 0, 180)
-		end)
-	end
+    -- Adicionar botões
+    for _, name in ipairs(tabContents[tab]) do
+        local b = Instance.new("TextButton", contentFrame)
+        b.Size = UDim2.new(1, 0, 0, 32)
+        b.Text = name
+        b.TextSize = 18
+        b.Font = Enum.Font.Gotham
+        b.TextColor3 = Color3.fromRGB(255, 255, 255)
+        b.BackgroundColor3 = Color3.fromRGB(120, 0, 180)
+        b.BorderSizePixel = 0
+        b.AutoButtonColor = true
+        b.TextXAlignment = Enum.TextXAlignment.Left
+        b.BackgroundTransparency = 0
+        b.Name = name
+        b.TextWrapped = true
+        b.ClipsDescendants = true
+        b.TextStrokeTransparency = 0.8
+        b.BackgroundTransparency = 0
+        b.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+        b.AutoButtonColor = true
+        b.MouseEnter:Connect(function()
+            TweenService:Create(b, hoverTweenInfo, {
+                BackgroundColor3 = Color3.fromRGB(150, 0, 220)
+            }):Play()
+        end)
+        b.MouseLeave:Connect(function()
+            TweenService:Create(b, hoverTweenInfo, {
+                BackgroundColor3 = Color3.fromRGB(120, 0, 180)
+            }):Play()
+        end)
+    end
 end
 
--- Criar abas
-criarAba("Entrada", function() mostrarBotoes("Entrada") end)
-criarAba("Casas", function() mostrarBotoes("Casas") end)
-criarAba("Carros", function() mostrarBotoes("Carros") end)
-criarAba("Avatar", function() mostrarBotoes("Avatar") end)
-criarAba("Fun", function() mostrarBotoes("Fun") end)
+-- Criar botões das abas
+for _, name in ipairs(tabs) do
+    local tabBtn = Instance.new("TextButton", tabFrame)
+    tabBtn.Size = UDim2.new(1, 0, 0, 36)
+    tabBtn.Text = name
+    tabBtn.TextSize = 18
+    tabBtn.Font = Enum.Font.GothamBold
+    tabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    tabBtn.BackgroundColor3 = Color3.fromRGB(120, 0, 180)
+    tabBtn.BorderSizePixel = 0
+    tabBtn.AutoButtonColor = true
+    tabButtons[name] = tabBtn
+    
+    -- Configurar efeito hover
+    setupButtonHoverEffect(tabBtn)
+    
+    tabBtn.MouseButton1Click:Connect(function()
+        switchTab(name)
+    end)
+end
+
+-- Ativar primeira aba por padrão
+switchTab("Entrada")
