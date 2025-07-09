@@ -1,76 +1,87 @@
--- Jogoroblox HUB - Tela de carregamento melhorada
+-- Jogoroblox HUB - Tela de carregamento corrigida
 local TweenService = game:GetService("TweenService")
 local TextService = game:GetService("TextService")
+local Players = game:GetService("Players")
 
-local gui = Instance.new("ScreenGui", game:GetService("CoreGui"))
+-- Criação da interface
+local player = Players.LocalPlayer
+local gui = Instance.new("ScreenGui", player.PlayerGui)  -- Alterado para PlayerGui
 gui.Name = "JogorobloxHub"
+gui.ResetOnSpawn = false
 gui.IgnoreGuiInset = true
 
+-- Fundo preto
 local fundo = Instance.new("Frame", gui)
 fundo.Size = UDim2.new(1, 0, 1, 0)
 fundo.Position = UDim2.new(0, 0, 0, 0)
 fundo.BackgroundColor3 = Color3.new(0, 0, 0)
+fundo.BackgroundTransparency = 0
+fundo.BorderSizePixel = 0
 
--- Contorno da barra
+-- Contorno da barra de carregamento (agora mais visível)
 local contorno = Instance.new("Frame", fundo)
 contorno.Size = UDim2.new(0.5, 0, 0, 20)
 contorno.Position = UDim2.new(0.25, 0, 0.5, 0)
 contorno.BackgroundColor3 = Color3.fromRGB(100, 0, 180)
-Instance.new("UICorner", contorno).CornerRadius = UDim.new(0, 10)
+contorno.BorderSizePixel = 0
+local contornoCorner = Instance.new("UICorner", contorno)
+contornoCorner.CornerRadius = UDim.new(0, 10)
 
+-- Barra de progresso roxa
 local barra = Instance.new("Frame", contorno)
 barra.Size = UDim2.new(0, 0, 1, 0)
 barra.BackgroundColor3 = Color3.fromRGB(150, 0, 255)
-Instance.new("UICorner", barra).CornerRadius = UDim.new(0, 10)
+barra.BorderSizePixel = 0
+local barraCorner = Instance.new("UICorner", barra)
+barraCorner.CornerRadius = UDim.new(0, 10)
 
--- Texto animado (letras independentes, fonte premium)
-local textoOriginal = "Jogoroblox HUB"
-local letras = {}
+-- Texto principal (agora mais centralizado e visível)
+local texto = Instance.new("TextLabel", fundo)
+texto.Text = "Jogoroblox HUB"
+texto.Size = UDim2.new(0, 300, 0, 55)  -- Tamanho fixo para melhor controle
+texto.Position = UDim2.new(0.5, -150, 0.39, 0)  -- Centralizado horizontalmente
+texto.AnchorPoint = Vector2.new(0.5, 0)
+texto.BackgroundTransparency = 1
+texto.Font = Enum.Font.FredokaOne
+texto.TextColor3 = Color3.new(1, 1, 1)
+texto.TextScaled = true
+texto.TextSize = 30
+texto.Name = "TextoAnimado"
 
--- Função para iniciar animação do texto
-local function iniciarAnimacaoTexto()
-    local baseX = 0.5 - (#textoOriginal * 0.012)
-    for i = 1, #textoOriginal do
-        local letra = textoOriginal:sub(i,i)
-        local letraLbl = Instance.new("TextLabel", fundo)
-        letraLbl.Text = letra
-        letraLbl.Size = UDim2.new(0, 25, 0, 55)
-        letraLbl.Position = UDim2.new(baseX + (i-1)*0.024, 0, 0.39, 0)
-        letraLbl.BackgroundTransparency = 1
-        letraLbl.Font = Enum.Font.FredokaOne -- Fonte mais bonita
-        letraLbl.TextColor3 = Color3.new(1, 1, 1)
-        letraLbl.TextScaled = true
-        letraLbl.Name = "Letra_"..i
-        table.insert(letras, letraLbl)
-
-        local info = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-        local props = {
-            Position = letraLbl.Position - UDim2.new(0, 0, 0, 8),
-            Rotation = letra == "J" and 360 or 0,
-            TextColor3 = Color3.fromRGB(150, 0, 255) -- Efeito de cor
-        }
-        local anim = TweenService:Create(letraLbl, info, props)
-        task.delay(0.05 * i, function()
-            anim:Play()
-        end)
-    end
+-- Função de animação do texto (simplificada e mais visível)
+local function animarTexto()
+    local info = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    local animacao = TweenService:Create(texto, info, {
+        TextColor3 = Color3.fromRGB(150, 0, 255),
+        Position = texto.Position - UDim2.new(0, 0, 0.02, 0)  -- Movimento mais suave
+    })
+    
+    local infoVolta = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    local animacaoVolta = TweenService:Create(texto, infoVolta, {
+        TextColor3 = Color3.new(1, 1, 1),
+        Position = texto.Position
+    })
+    
+    animacao:Play()
+    animacao.Completed:Connect(function()
+        animacaoVolta:Play()
+    end)
 end
 
--- Encher barra com trigger aos 50%
+-- Animação da barra de carregamento
 local animacaoIniciada = false
 for i = 1, 100 do
     barra.Size = UDim2.new(i / 100, 0, 1, 0)
     
-    -- Inicia animação quando chegar em 50%
     if i >= 50 and not animacaoIniciada then
         animacaoIniciada = true
-        iniciarAnimacaoTexto()
+        animarTexto()
     end
     
     task.wait(0.01)
 end
 
--- Reduzir barra para campo
+-- Transição para o campo de key
 task.wait(0.5)
 local reduzir = TweenService:Create(contorno, TweenInfo.new(0.5), {
     Size = UDim2.new(0.3, 0, 0, 35),
@@ -80,39 +91,43 @@ reduzir:Play()
 reduzir.Completed:Wait()
 barra:Destroy()
 
--- Campo de digitar
+-- Campo de digitação
 local caixa = Instance.new("TextBox", contorno)
-caixa.Size = UDim2.new(1, 0, 1, 0)
-caixa.Position = UDim2.new(0, 0, 0, 0)
-caixa.BackgroundColor3 = Color3.fromRGB(150, 0, 255)
+caixa.Size = UDim2.new(1, -10, 1, -10)
+caixa.Position = UDim2.new(0, 5, 0, 5)
+caixa.BackgroundColor3 = Color3.fromRGB(70, 0, 130)
 caixa.PlaceholderText = "Digite a Key"
 caixa.Text = ""
 caixa.TextColor3 = Color3.new(1, 1, 1)
-caixa.Font = Enum.Font.FredokaOne -- Fonte mais bonita
+caixa.Font = Enum.Font.FredokaOne
 caixa.TextScaled = true
-Instance.new("UICorner", caixa).CornerRadius = UDim.new(0, 10)
+caixa.ClearTextOnFocus = false
+local caixaCorner = Instance.new("UICorner", caixa)
+caixaCorner.CornerRadius = UDim.new(0, 8)
 
--- Botão verificar
+-- Botão de verificação
 local botao = Instance.new("TextButton", fundo)
 botao.Text = "Verificar"
 botao.Size = UDim2.new(0, 150, 0, 35)
-botao.Position = UDim2.new(0.5, -75, 0.5, 50)
+botao.Position = UDim2.new(0.5, -75, 0.6, 0)
 botao.BackgroundColor3 = Color3.fromRGB(100, 0, 180)
 botao.TextColor3 = Color3.new(1, 1, 1)
-botao.Font = Enum.Font.FredokaOne -- Fonte mais bonita
+botao.Font = Enum.Font.FredokaOne
 botao.TextScaled = true
-Instance.new("UICorner", botao).CornerRadius = UDim.new(0, 8)
+botao.TextSize = 20
+local botaoCorner = Instance.new("UICorner", botao)
+botaoCorner.CornerRadius = UDim.new(0, 8)
 
--- Verificação
+-- Verificação da key
 local keyCorreta = "jogoroblox123"
 botao.MouseButton1Click:Connect(function()
     if caixa.Text == keyCorreta then
         gui:Destroy()
-
-loadstring(game:HttpGet("https://raw.githubusercontent.com/rubzinbr/jogorobloxhub/main/menu.lua"))()
-        -- Carrega menu
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/rubzinbr/jogorobloxhub/main/menu.lua"))()
     else
         caixa.Text = ""
         caixa.PlaceholderText = "Key incorreta!"
+        task.wait(1.5)
+        caixa.PlaceholderText = "Digite a Key"
     end
 end)
