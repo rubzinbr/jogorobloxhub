@@ -18,10 +18,24 @@ fundo.BackgroundColor3 = Color3.new(0, 0, 0)
 fundo.BackgroundTransparency = 0
 fundo.BorderSizePixel = 0
 
+-- Texto principal (posicionado acima do campo de key, mais à direita)
+local texto = Instance.new("TextLabel", fundo)
+texto.Text = "Jogoroblox HUB"
+texto.Size = UDim2.new(0, 300, 0, 55)  -- Tamanho fixo para melhor controle
+texto.Position = UDim2.new(0.5, 0, 0.38, 0)  -- Movido mais para a direita
+texto.AnchorPoint = Vector2.new(0.5, 0)
+texto.BackgroundTransparency = 1
+texto.Font = Enum.Font.FredokaOne
+texto.TextColor3 = Color3.new(1, 1, 1)
+texto.TextScaled = true
+texto.TextSize = 30
+texto.Name = "TextoAnimado"
+texto.TextTransparency = 1  -- Começa invisível para o fade in
+
 -- Contorno da barra de carregamento (agora mais visível)
 local contorno = Instance.new("Frame", fundo)
 contorno.Size = UDim2.new(0.5, 0, 0, 20)
-contorno.Position = UDim2.new(0.25, 0, 0.5, 0)
+contorno.Position = UDim2.new(0.25, 0, 0.5, 0)  -- Mantido na posição original
 contorno.BackgroundColor3 = Color3.fromRGB(100, 0, 180)
 contorno.BorderSizePixel = 0
 local contornoCorner = Instance.new("UICorner", contorno)
@@ -35,18 +49,11 @@ barra.BorderSizePixel = 0
 local barraCorner = Instance.new("UICorner", barra)
 barraCorner.CornerRadius = UDim.new(0, 10)
 
--- Texto principal (agora mais centralizado e visível)
-local texto = Instance.new("TextLabel", fundo)
-texto.Text = "Jogoroblox HUB"
-texto.Size = UDim2.new(0, 300, 0, 55)  -- Tamanho fixo para melhor controle
-texto.Position = UDim2.new(0.5, -150, 0.39, 0)  -- Centralizado horizontalmente
-texto.AnchorPoint = Vector2.new(0.5, 0)
-texto.BackgroundTransparency = 1
-texto.Font = Enum.Font.FredokaOne
-texto.TextColor3 = Color3.new(1, 1, 1)
-texto.TextScaled = true
-texto.TextSize = 30
-texto.Name = "TextoAnimado"
+-- Animação fade in do título
+local fadeInTitulo = TweenService:Create(texto, TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+    TextTransparency = 0
+})
+fadeInTitulo:Play()
 
 -- Função de animação do texto (simplificada e mais visível)
 local function animarTexto()
