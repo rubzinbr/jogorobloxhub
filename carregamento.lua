@@ -270,7 +270,7 @@ local keyCorreta = "jogoroblox123"
 botao.MouseButton1Click:Connect(function()
     if caixa.Text == keyCorreta then
         gui:Destroy()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/rubzinbr/jogorobloxhub/main/menu.lua"))()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/rubzinbr/jogorobloxhub/main/menu_brookhaven.lua"))()
     else
         caixa.Text = ""
         caixa.PlaceholderText = "Key incorreta!"
