@@ -1,6 +1,7 @@
--- Jogoroblox HUB - Estilo Dashboard (Com Animações)
+-- Jogoroblox HUB - Estilo Dashboard (Com Animações e Sons)
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
+local SoundService = game:GetService("SoundService")
 local player = Players.LocalPlayer
 
 -- Verificar se já existe uma GUI e destruir
@@ -11,6 +12,30 @@ end
 -- Interface principal
 local gui = Instance.new("ScreenGui", game:GetService("CoreGui"))
 gui.Name = "JogorobloxInterface"
+
+-- SISTEMA DE SOM
+local function criarSom()
+    local som = Instance.new("Sound")
+    som.SoundId = "rbxasset://sounds/electronicpingshort.wav" -- Som padrão do Roblox
+    som.Volume = 0.5
+    som.Pitch = 1.2
+    som.Parent = gui
+    return som
+end
+
+-- Função para tocar som de clique
+local function tocarSomClique()
+    local som = criarSom()
+    som:Play()
+    
+    -- Destruir o som após terminar
+    som.Ended:Connect(function()
+        som:Destroy()
+    end)
+    
+    -- Failsafe para destruir o som após 2 segundos
+    game:GetService("Debris"):AddItem(som, 2)
+end
 
 local main = Instance.new("Frame", gui)
 main.Name = "MainMenu"
@@ -122,6 +147,7 @@ close.MouseLeave:Connect(function()
 end)
 
 close.MouseButton1Click:Connect(function()
+    tocarSomClique()
 	gui:Destroy()
 end)
 
@@ -135,8 +161,8 @@ titulo.Position = UDim2.new(0, 0, 0, 5)
 titulo.BackgroundTransparency = 1
 titulo.Text = "Jogoroblox HUB"
 titulo.TextColor3 = Color3.new(1, 1, 1)
-titulo.Font = Enum.Font.FredokaOne  -- Mudança aqui: de GothamBold para FredokaOne
-titulo.TextSize = 20  -- Aumentado de 16 para 20
+titulo.Font = Enum.Font.FredokaOne
+titulo.TextSize = 20
 titulo.TextXAlignment = Enum.TextXAlignment.Center
 
 -- Container para as abas
@@ -265,6 +291,7 @@ local function criarAba(nome, callback)
 	end)
 	
 	aba.MouseButton1Click:Connect(function()
+		tocarSomClique() -- Som ao clicar na aba
 		-- Resetar cor da aba anterior
 		if abaAtiva then
 			abaAtiva.BackgroundColor3 = Color3.fromRGB(70, 0, 140)
@@ -323,6 +350,7 @@ local function criarBotao(nome, funcao, delay)
 	end)
 	
 	botao.MouseButton1Click:Connect(function()
+		tocarSomClique() -- Som ao clicar no botão
 		if funcao then
 			funcao()
 		end
