@@ -3,15 +3,19 @@ local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local SoundService = game:GetService("SoundService")
 local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
 
 -- Verificar se já existe uma GUI e destruir
-if game:GetService("CoreGui"):FindFirstChild("JogorobloxInterface") then
-    game:GetService("CoreGui"):FindFirstChild("JogorobloxInterface"):Destroy()
+if playerGui:FindFirstChild("JogorobloxInterface") then
+    playerGui:FindFirstChild("JogorobloxInterface"):Destroy()
+    print("GUI anterior destruída.")
 end
 
 -- Interface principal
-local gui = Instance.new("ScreenGui", game:GetService("CoreGui"))
+local gui = Instance.new("ScreenGui", playerGui)
 gui.Name = "JogorobloxInterface"
+gui.ResetOnSpawn = false -- Impede que a GUI seja reiniciada ao morrer
+print("ScreenGui criada em PlayerGui com ResetOnSpawn desativado.")
 
 -- SISTEMA DE SOM
 local function criarSom()
@@ -20,6 +24,7 @@ local function criarSom()
     som.Volume = 0.5
     som.Pitch = 1.2
     som.Parent = gui
+    print("Som criado com ID:", som.SoundId)
     return som
 end
 
@@ -27,10 +32,12 @@ end
 local function tocarSomClique()
     local som = criarSom()
     som:Play()
+    print("Som de clique tocado.")
     
     -- Destruir o som após terminar
     som.Ended:Connect(function()
         som:Destroy()
+        print("Som destruído.")
     end)
     
     -- Failsafe para destruir o som após 2 segundos
@@ -40,18 +47,21 @@ end
 local main = Instance.new("Frame", gui)
 main.Name = "MainMenu"
 main.AnchorPoint = Vector2.new(0.5, 0.5)
-main.Position = UDim2.new(0.5, 0, 0.42, 0)
-main.Size = UDim2.new(0, 700, 0, 350)
+main.Position = UDim2.new(0.5, 0, 0.5, 0) -- Inicia no centro para a animação de abertura
+main.Size = UDim2.new(0, 0, 0, 0) -- Inicia com tamanho zero para a animação
 main.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 main.BackgroundTransparency = 0
 main.BorderSizePixel = 0
 main.ClipsDescendants = true
+main.Visible = false -- Inicia oculto, será mostrado pela animação
+print("Frame principal criado.")
 
 -- Contorno roxo animado
 local contorno = Instance.new("UIStroke", main)
 contorno.Color = Color3.fromRGB(140, 0, 255)
 contorno.Thickness = 3
 contorno.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+print("Contorno criado.")
 
 -- Gradiente animado para o contorno
 local gradiente = Instance.new("UIGradient", contorno)
@@ -60,6 +70,7 @@ gradiente.Color = ColorSequence.new({
     ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 0, 140)),
     ColorSequenceKeypoint.new(1, Color3.fromRGB(140, 0, 255))
 })
+print("Gradiente criado.")
 
 -- Animação de rotação do gradiente
 local function animarContorno()
@@ -73,6 +84,7 @@ local function animarContorno()
     end)
 end
 animarContorno()
+print("Animação de contorno iniciada.")
 
 local corner = Instance.new("UICorner", main)
 corner.CornerRadius = UDim.new(0, 12)
@@ -144,10 +156,6 @@ end)
 close.MouseLeave:Connect(function()
     closeStroke.Transparency = 1
     close.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-end)
-
-close.MouseButton1Click:Connect(function()
-    tocarSomClique()
 end)
 
 local corner2 = Instance.new("UICorner", close)
@@ -259,269 +267,269 @@ end
 
 -- Função para criar abas
 local function criarAba(nome, callback)
-	local aba = Instance.new("TextButton", abasContainer)
-	aba.Size = UDim2.new(1, -10, 0, 35)
-	aba.BackgroundColor3 = Color3.fromRGB(70, 0, 140)
-	aba.Text = nome
-	aba.TextColor3 = Color3.new(1, 1, 1)
-	aba.Font = Enum.Font.Gotham
-	aba.TextSize = 14
-	aba.BorderSizePixel = 0
+    local aba = Instance.new("TextButton", abasContainer)
+    aba.Size = UDim2.new(1, -10, 0, 35)
+    aba.BackgroundColor3 = Color3.fromRGB(70, 0, 140)
+    aba.Text = nome
+    aba.TextColor3 = Color3.new(1, 1, 1)
+    aba.Font = Enum.Font.Gotham
+    aba.TextSize = 14
+    aba.BorderSizePixel = 0
 
-	local uiCorner = Instance.new("UICorner", aba)
-	uiCorner.CornerRadius = UDim.new(0, 8)
+    local uiCorner = Instance.new("UICorner", aba)
+    uiCorner.CornerRadius = UDim.new(0, 8)
 
-	-- Adicionar à lista de abas
-	table.insert(todasAbas, aba)
+    -- Adicionar à lista de abas
+    table.insert(todasAbas, aba)
 
-	-- Efeitos hover com animação
-	aba.MouseEnter:Connect(function()
-		if aba ~= abaAtiva then
-			aba.BackgroundColor3 = Color3.fromRGB(100, 0, 180)
-			animarAbas(aba)
-		end
-	end)
-	
-	aba.MouseLeave:Connect(function()
-		if aba ~= abaAtiva then
-			aba.BackgroundColor3 = Color3.fromRGB(70, 0, 140)
-			resetarAbasAnimacao()
-		end
-	end)
-	
-	aba.MouseButton1Click:Connect(function()
-		tocarSomClique() -- Som ao clicar na aba
-		-- Resetar cor da aba anterior
-		if abaAtiva then
-			abaAtiva.BackgroundColor3 = Color3.fromRGB(70, 0, 140)
-		end
-		-- Destacar aba atual
-		aba.BackgroundColor3 = Color3.fromRGB(140, 0, 255)
-		abaAtiva = aba
-		animarAbas(aba)
-		callback()
-	end)
-	
-	return aba
+    -- Efeitos hover com animação
+    aba.MouseEnter:Connect(function()
+        if aba ~= abaAtiva then
+            aba.BackgroundColor3 = Color3.fromRGB(100, 0, 180)
+            animarAbas(aba)
+        end
+    end)
+    
+    aba.MouseLeave:Connect(function()
+        if aba ~= abaAtiva then
+            aba.BackgroundColor3 = Color3.fromRGB(70, 0, 140)
+            resetarAbasAnimacao()
+        end
+    end)
+    
+    aba.MouseButton1Click:Connect(function()
+        tocarSomClique() -- Som ao clicar na aba
+        -- Resetar cor da aba anterior
+        if abaAtiva then
+            abaAtiva.BackgroundColor3 = Color3.fromRGB(70, 0, 140)
+        end
+        -- Destacar aba atual
+        aba.BackgroundColor3 = Color3.fromRGB(140, 0, 255)
+        abaAtiva = aba
+        animarAbas(aba)
+        callback()
+    end)
+    
+    return aba
 end
 
 -- Função para criar botões com funcionalidade
 local function criarBotao(nome, funcao, delay)
-	local botao = Instance.new("TextButton", painelBotoes)
-	botao.Size = UDim2.new(1, -10, 0, 30)
-	botao.BackgroundColor3 = Color3.fromRGB(90, 0, 180)
-	botao.Text = nome
-	botao.TextColor3 = Color3.new(1, 1, 1)
-	botao.Font = Enum.Font.Gotham
-	botao.TextSize = 14
-	botao.BorderSizePixel = 0
-	
-	-- Configurar posição inicial para animação mais suave (menos distância)
-	botao.Position = UDim2.new(0, 0, 0, 30)
-	botao.BackgroundTransparency = 1
-	botao.TextTransparency = 1
+    local botao = Instance.new("TextButton", painelBotoes)
+    botao.Size = UDim2.new(1, -10, 0, 30)
+    botao.BackgroundColor3 = Color3.fromRGB(90, 0, 180)
+    botao.Text = nome
+    botao.TextColor3 = Color3.new(1, 1, 1)
+    botao.Font = Enum.Font.Gotham
+    botao.TextSize = 14
+    botao.BorderSizePixel = 0
+    
+    -- Configurar posição inicial para animação mais suave (menos distância)
+    botao.Position = UDim2.new(0, 0, 0, 30)
+    botao.BackgroundTransparency = 1
+    botao.TextTransparency = 1
 
-	local bcorner = Instance.new("UICorner", botao)
-	bcorner.CornerRadius = UDim.new(0, 6)
+    local bcorner = Instance.new("UICorner", botao)
+    bcorner.CornerRadius = UDim.new(0, 6)
 
-	-- Adicionar à lista de botões
-	table.insert(todosBotoes, botao)
+    -- Adicionar à lista de botões
+    table.insert(todosBotoes, botao)
 
-	-- Animação de entrada com delay mais suave
-	wait(delay or 0)
-	local tweenInfo = TweenInfo.new(0.6, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
-	local tween = TweenService:Create(botao, tweenInfo, {
-		Position = UDim2.new(0, 0, 0, 0),
-		BackgroundTransparency = 0,
-		TextTransparency = 0
-	})
-	tween:Play()
+    -- Animação de entrada com delay mais suave
+    wait(delay or 0)
+    local tweenInfo = TweenInfo.new(0.6, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+    local tween = TweenService:Create(botao, tweenInfo, {
+        Position = UDim2.new(0, 0, 0, 0),
+        BackgroundTransparency = 0,
+        TextTransparency = 0
+    })
+    tween:Play()
 
-	-- Efeitos hover com animação
-	botao.MouseEnter:Connect(function()
-		botao.BackgroundColor3 = Color3.fromRGB(140, 0, 255)
-		animarBotoes(botao)
-	end)
-	
-	botao.MouseLeave:Connect(function()
-		botao.BackgroundColor3 = Color3.fromRGB(90, 0, 180)
-		resetarBotoesAnimacao()
-	end)
-	
-	botao.MouseButton1Click:Connect(function()
-		tocarSomClique() -- Som ao clicar no botão
-		if funcao then
-			funcao()
-		end
-	end)
-	
-	return botao
+    -- Efeitos hover com animação
+    botao.MouseEnter:Connect(function()
+        botao.BackgroundColor3 = Color3.fromRGB(140, 0, 255)
+        animarBotoes(botao)
+    end)
+    
+    botao.MouseLeave:Connect(function()
+        botao.BackgroundColor3 = Color3.fromRGB(90, 0, 180)
+        resetarBotoesAnimacao()
+    end)
+    
+    botao.MouseButton1Click:Connect(function()
+        tocarSomClique() -- Som ao clicar no botão
+        if funcao then
+            funcao()
+        end
+    end)
+    
+    return botao
 end
 
 -- Função para limpar botões mantendo o layout
 local function limparBotoes()
-	-- Limpar array de botões
-	todosBotoes = {}
-	
-	for _, child in pairs(painelBotoes:GetChildren()) do
-		if child:IsA("TextButton") and child ~= close then
-			child:Destroy()
-		end
-	end
+    -- Limpar array de botões
+    todosBotoes = {}
+    
+    for _, child in pairs(painelBotoes:GetChildren()) do
+        if child:IsA("TextButton") and child ~= close then
+            child:Destroy()
+        end
+    end
 end
 
 -- Criar botões da aba
 local function mostrarBotoes(nomeAba)
-	limparBotoes()
-	
-	-- Botões específicos para cada aba com animação sequencial
-	if nomeAba == "Entrada" then
-		spawn(function()
-			criarBotao("Teleportar Spawn", function()
-				if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-					player.Character.HumanoidRootPart.CFrame = workspace.SpawnLocation.CFrame
-				end
-			end, 0.05)
-		end)
-		spawn(function()
-			criarBotao("Reset Character", function()
-				if player.Character and player.Character:FindFirstChild("Humanoid") then
-					player.Character.Humanoid.Health = 0
-				end
-			end, 0.1)
-		end)
-		spawn(function()
-			criarBotao("Fly Toggle", function()
-				print("Fly ativado/desativado")
-			end, 0.15)
-		end)
-		spawn(function()
-			criarBotao("Noclip Toggle", function()
-				print("Noclip ativado/desativado")
-			end, 0.2)
-		end)
-		spawn(function()
-			criarBotao("Speed Boost", function()
-				if player.Character and player.Character:FindFirstChild("Humanoid") then
-					player.Character.Humanoid.WalkSpeed = 50
-				end
-			end, 0.25)
-		end)
-		
-	elseif nomeAba == "Casas" then
-		spawn(function()
-			criarBotao("Casa 1", function()
-				print("Teleportando para Casa 1")
-			end, 0.05)
-		end)
-		spawn(function()
-			criarBotao("Casa 2", function()
-				print("Teleportando para Casa 2")
-			end, 0.1)
-		end)
-		spawn(function()
-			criarBotao("Casa 3", function()
-				print("Teleportando para Casa 3")
-			end, 0.15)
-		end)
-		spawn(function()
-			criarBotao("Casa Premium", function()
-				print("Teleportando para Casa Premium")
-			end, 0.2)
-		end)
-		spawn(function()
-			criarBotao("Todas as Casas", function()
-				print("Mostrando todas as casas")
-			end, 0.25)
-		end)
-		
-	elseif nomeAba == "Carros" then
-		spawn(function()
-			criarBotao("Spawnar Carro", function()
-				print("Spawnando carro")
-			end, 0.1)
-		end)
-		spawn(function()
-			criarBotao("Carro Rápido", function()
-				print("Spawnando carro rápido")
-			end, 0.2)
-		end)
-		spawn(function()
-			criarBotao("Carro Voador", function()
-				print("Spawnando carro voador")
-			end, 0.3)
-		end)
-		spawn(function()
-			criarBotao("Remover Carros", function()
-				print("Removendo todos os carros")
-			end, 0.4)
-		end)
-		spawn(function()
-			criarBotao("Teleportar Garagem", function()
-				print("Teleportando para garagem")
-			end, 0.5)
-		end)
-		
-	elseif nomeAba == "Avatar" then
-		spawn(function()
-			criarBotao("Tamanho Normal", function()
-				if player.Character and player.Character:FindFirstChild("Humanoid") then
-					player.Character.Humanoid.HipHeight = 0
-				end
-			end, 0.1)
-		end)
-		spawn(function()
-			criarBotao("Gigante", function()
-				if player.Character and player.Character:FindFirstChild("Humanoid") then
-					player.Character.Humanoid.HipHeight = 10
-				end
-			end, 0.2)
-		end)
-		spawn(function()
-			criarBotao("Anão", function()
-				if player.Character and player.Character:FindFirstChild("Humanoid") then
-					player.Character.Humanoid.HipHeight = -2
-				end
-			end, 0.3)
-		end)
-		spawn(function()
-			criarBotao("Invisível", function()
-				print("Tornando invisível")
-			end, 0.4)
-		end)
-		spawn(function()
-			criarBotao("Restaurar Avatar", function()
-				print("Restaurando avatar original")
-			end, 0.5)
-		end)
-		
-	elseif nomeAba == "Fun" then
-		spawn(function()
-			criarBotao("Spam Jump", function()
-				print("Spam jump ativado")
-			end, 0.1)
-		end)
-		spawn(function()
-			criarBotao("Dança", function()
-				print("Dançando")
-			end, 0.2)
-		end)
-		spawn(function()
-			criarBotao("Explosão", function()
-				print("Criando explosão")
-			end, 0.3)
-		end)
-		spawn(function()
-			criarBotao("Chuva de Objetos", function()
-				print("Chuva de objetos ativada")
-			end, 0.4)
-		end)
-		spawn(function()
-			criarBotao("Efeitos Especiais", function()
-				print("Efeitos especiais ativados")
-			end, 0.5)
-		end)
-	end
+    limparBotoes()
+    
+    -- Botões específicos para cada aba com animação sequencial
+    if nomeAba == "Entrada" then
+        spawn(function()
+            criarBotao("Teleportar Spawn", function()
+                if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                    player.Character.HumanoidRootPart.CFrame = workspace.SpawnLocation.CFrame
+                end
+            end, 0.05)
+        end)
+        spawn(function()
+            criarBotao("Reset Character", function()
+                if player.Character and player.Character:FindFirstChild("Humanoid") then
+                    player.Character.Humanoid.Health = 0
+                end
+            end, 0.1)
+        end)
+        spawn(function()
+            criarBotao("Fly Toggle", function()
+                print("Fly ativado/desativado")
+            end, 0.15)
+        end)
+        spawn(function()
+            criarBotao("Noclip Toggle", function()
+                print("Noclip ativado/desativado")
+            end, 0.2)
+        end)
+        spawn(function()
+            criarBotao("Speed Boost", function()
+                if player.Character and player.Character:FindFirstChild("Humanoid") then
+                    player.Character.Humanoid.WalkSpeed = 50
+                end
+            end, 0.25)
+        end)
+        
+    elseif nomeAba == "Casas" then
+        spawn(function()
+            criarBotao("Casa 1", function()
+                print("Teleportando para Casa 1")
+            end, 0.05)
+        end)
+        spawn(function()
+            criarBotao("Casa 2", function()
+                print("Teleportando para Casa 2")
+            end, 0.1)
+        end)
+        spawn(function()
+            criarBotao("Casa 3", function()
+                print("Teleportando para Casa 3")
+            end, 0.15)
+        end)
+        spawn(function()
+            criarBotao("Casa Premium", function()
+                print("Teleportando para Casa Premium")
+            end, 0.2)
+        end)
+        spawn(function()
+            criarBotao("Todas as Casas", function()
+                print("Mostrando todas as casas")
+            end, 0.25)
+        end)
+        
+    elseif nomeAba == "Carros" then
+        spawn(function()
+            criarBotao("Spawnar Carro", function()
+                print("Spawnando carro")
+            end, 0.1)
+        end)
+        spawn(function()
+            criarBotao("Carro Rápido", function()
+                print("Spawnando carro rápido")
+            end, 0.2)
+        end)
+        spawn(function()
+            criarBotao("Carro Voador", function()
+                print("Spawnando carro voador")
+            end, 0.3)
+        end)
+        spawn(function()
+            criarBotao("Remover Carros", function()
+                print("Removendo todos os carros")
+            end, 0.4)
+        end)
+        spawn(function()
+            criarBotao("Teleportar Garagem", function()
+                print("Teleportando para garagem")
+            end, 0.5)
+        end)
+        
+    elseif nomeAba == "Avatar" then
+        spawn(function()
+            criarBotao("Tamanho Normal", function()
+                if player.Character and player.Character:FindFirstChild("Humanoid") then
+                    player.Character.Humanoid.HipHeight = 0
+                end
+            end, 0.1)
+        end)
+        spawn(function()
+            criarBotao("Gigante", function()
+                if player.Character and player.Character:FindFirstChild("Humanoid") then
+                    player.Character.Humanoid.HipHeight = 10
+                end
+            end, 0.2)
+        end)
+        spawn(function()
+            criarBotao("Anão", function()
+                if player.Character and player.Character:FindFirstChild("Humanoid") then
+                    player.Character.Humanoid.HipHeight = -2
+                end
+            end, 0.3)
+        end)
+        spawn(function()
+            criarBotao("Invisível", function()
+                print("Tornando invisível")
+            end, 0.4)
+        end)
+        spawn(function()
+            criarBotao("Restaurar Avatar", function()
+                print("Restaurando avatar original")
+            end, 0.5)
+        end)
+        
+    elseif nomeAba == "Fun" then
+        spawn(function()
+            criarBotao("Spam Jump", function()
+                print("Spam jump ativado")
+            end, 0.1)
+        end)
+        spawn(function()
+            criarBotao("Dança", function()
+                print("Dançando")
+            end, 0.2)
+        end)
+        spawn(function()
+            criarBotao("Explosão", function()
+                print("Criando explosão")
+            end, 0.3)
+        end)
+        spawn(function()
+            criarBotao("Chuva de Objetos", function()
+                print("Chuva de objetos ativada")
+            end, 0.4)
+        end)
+        spawn(function()
+            criarBotao("Efeitos Especiais", function()
+                print("Efeitos especiais ativados")
+            end, 0.5)
+        end)
+    end
 end
 
 -- Criar abas
@@ -535,17 +543,18 @@ criarAba("Fun", function() mostrarBotoes("Fun") end)
 abaEntrada.BackgroundColor3 = Color3.fromRGB(140, 0, 255)
 abaAtiva = abaEntrada
 mostrarBotoes("Entrada")
+print("Abas e botões inicializados.")
 
 -- BOTÃO FLUTUANTE PARA REABRIR MENU
 local botaoReabrir = Instance.new("TextButton", gui)
-botaoReabrir.Size = UDim2.new(0, 50, 0, 50)
+botaoReabrir.Size = UDim2.new(0, 0, 0, 0) -- Inicia com tamanho zero para a animação
 botaoReabrir.Position = UDim2.new(0, 20, 0.5, -25) -- posição inicial
 botaoReabrir.BackgroundColor3 = Color3.fromRGB(140, 0, 255)
 botaoReabrir.Text = "+"
 botaoReabrir.TextColor3 = Color3.new(1, 1, 1)
 botaoReabrir.Font = Enum.Font.GothamBold
 botaoReabrir.TextSize = 30
-botaoReabrir.Visible = false
+botaoReabrir.Visible = false -- Inicia oculto, será animado
 botaoReabrir.AutoButtonColor = false
 
 local reabrirCorner = Instance.new("UICorner", botaoReabrir)
@@ -555,45 +564,95 @@ reabrirCorner.CornerRadius = UDim.new(1, 0)
 local dragging, dragInput, dragStart, startPos
 
 botaoReabrir.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 then
-		dragging = true
-		dragStart = input.Position
-		startPos = botaoReabrir.Position
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = botaoReabrir.Position
 
-		input.Changed:Connect(function()
-			if input.UserInputState == Enum.UserInputState.End then
-				dragging = false
-			end
-		end)
-	end
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
 end)
 
 botaoReabrir.InputChanged:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseMovement then
-		dragInput = input
-	end
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
 end)
 
 game:GetService("UserInputService").InputChanged:Connect(function(input)
-	if input == dragInput and dragging then
-		local delta = input.Position - dragStart
-		botaoReabrir.Position = UDim2.new(
-			startPos.X.Scale, startPos.X.Offset + delta.X,
-			startPos.Y.Scale, startPos.Y.Offset + delta.Y
-		)
-	end
+    if input == dragInput and dragging then
+        local delta = input.Position - dragStart
+        botaoReabrir.Position = UDim2.new(
+            startPos.X.Scale, startPos.X.Offset + delta.X,
+            startPos.Y.Scale, startPos.Y.Offset + delta.Y
+        )
+    end
 end)
 
--- Quando clicar no botão, reabre o menu
+-- Função para animar a abertura do botão flutuante
+local function animarAberturaBotao()
+    botaoReabrir.Visible = true
+    local tweenInfo = TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+    local tween = TweenService:Create(botaoReabrir, tweenInfo, {
+        Size = UDim2.new(0, 50, 0, 50) -- Cresce para o tamanho original
+    })
+    tween:Play()
+    print("Animação de abertura do botão iniciada.")
+    tween.Completed:Connect(function()
+        print("Animação de abertura do botão concluída.")
+    end)
+end
+
+-- Chamar a animação do botão ao iniciar
+animarAberturaBotao()
+
+-- Função para animar a abertura do hub com efeito de rebote
+local function animarAbertura()
+    botaoReabrir.Visible = false -- Oculta o botão antes da animação
+    main.Visible = true
+    local tweenInfo = TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+    local tween = TweenService:Create(main, tweenInfo, {
+        Size = UDim2.new(0, 700, 0, 350), -- Cresce para o tamanho original
+        Position = UDim2.new(0.5, 0, 0.42, 0) -- Move para a posição original
+    })
+    tween:Play()
+    print("Animação de abertura iniciada.")
+    tween.Completed:Connect(function()
+        botaoReabrir.Visible = false
+        print("Animação de abertura concluída.")
+    end)
+end
+
+-- Quando clicar no botão, reabre o menu com animação
 botaoReabrir.MouseButton1Click:Connect(function()
-	tocarSomClique()
-	main.Visible = true
-	botaoReabrir.Visible = false
+    tocarSomClique()
+    animarAbertura()
+    print("Botão de reabrir clicado, iniciando abertura.")
 end)
 
--- Modificar o botão de fechar (X) para mostrar esse botão ao fechar
+-- Função para animar o fechamento do hub com efeito de rebote
+local function animarFechamento()
+    local tweenInfo = TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+    local tween = TweenService:Create(main, tweenInfo, {
+        Size = UDim2.new(0, 0, 0, 0), -- Encolhe para um ponto
+        Position = UDim2.new(0.5, 0, 0.5, 0) -- Centraliza no ponto
+    })
+    tween:Play()
+    print("Animação de fechamento iniciada.")
+    tween.Completed:Connect(function()
+        main.Visible = false
+        animarAberturaBotao() -- Reaparece o botão com animação
+        print("Animação concluída, menu oculto.")
+    end)
+end
+
+-- Modificar o botão de fechar (X) para mostrar esse botão ao fechar com animação
 close.MouseButton1Click:Connect(function()
-	tocarSomClique()
-	main.Visible = false
-	botaoReabrir.Visible = true
+    tocarSomClique()
+    animarFechamento()
+    print("Botão X clicado, iniciando fechamento.")
 end)
