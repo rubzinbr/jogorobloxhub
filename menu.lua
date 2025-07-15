@@ -128,14 +128,14 @@ end)
 local corner2 = Instance.new("UICorner", close)
 corner2.CornerRadius = UDim.new(1, 0)
 
--- TÍTULO MAIOR
+-- TÍTULO MAIOR COM FONTE FREDOKA ONE
 local titulo = Instance.new("TextLabel", sidebar)
 titulo.Size = UDim2.new(1, 0, 0, 50)
 titulo.Position = UDim2.new(0, 0, 0, 5)
 titulo.BackgroundTransparency = 1
 titulo.Text = "Jogoroblox HUB"
 titulo.TextColor3 = Color3.new(1, 1, 1)
-titulo.Font = Enum.Font.GothamBold
+titulo.Font = Enum.Font.FredokaOne  -- Mudança aqui: de GothamBold para FredokaOne
 titulo.TextSize = 20  -- Aumentado de 16 para 20
 titulo.TextXAlignment = Enum.TextXAlignment.Center
 
@@ -280,7 +280,7 @@ local function criarAba(nome, callback)
 end
 
 -- Função para criar botões com funcionalidade
-local function criarBotao(nome, funcao)
+local function criarBotao(nome, funcao, delay)
 	local botao = Instance.new("TextButton", painelBotoes)
 	botao.Size = UDim2.new(1, -10, 0, 30)
 	botao.BackgroundColor3 = Color3.fromRGB(90, 0, 180)
@@ -289,12 +289,27 @@ local function criarBotao(nome, funcao)
 	botao.Font = Enum.Font.Gotham
 	botao.TextSize = 14
 	botao.BorderSizePixel = 0
+	
+	-- Configurar posição inicial para animação mais suave (menos distância)
+	botao.Position = UDim2.new(0, 0, 0, 30)
+	botao.BackgroundTransparency = 1
+	botao.TextTransparency = 1
 
 	local bcorner = Instance.new("UICorner", botao)
 	bcorner.CornerRadius = UDim.new(0, 6)
 
 	-- Adicionar à lista de botões
 	table.insert(todosBotoes, botao)
+
+	-- Animação de entrada com delay mais suave
+	wait(delay or 0)
+	local tweenInfo = TweenInfo.new(0.6, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+	local tween = TweenService:Create(botao, tweenInfo, {
+		Position = UDim2.new(0, 0, 0, 0),
+		BackgroundTransparency = 0,
+		TextTransparency = 0
+	})
+	tween:Play()
 
 	-- Efeitos hover com animação
 	botao.MouseEnter:Connect(function()
@@ -332,102 +347,152 @@ end
 local function mostrarBotoes(nomeAba)
 	limparBotoes()
 	
-	-- Botões específicos para cada aba
+	-- Botões específicos para cada aba com animação sequencial
 	if nomeAba == "Entrada" then
-		criarBotao("Teleportar Spawn", function()
-			if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-				player.Character.HumanoidRootPart.CFrame = workspace.SpawnLocation.CFrame
-			end
+		spawn(function()
+			criarBotao("Teleportar Spawn", function()
+				if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+					player.Character.HumanoidRootPart.CFrame = workspace.SpawnLocation.CFrame
+				end
+			end, 0.05)
 		end)
-		criarBotao("Reset Character", function()
-			if player.Character and player.Character:FindFirstChild("Humanoid") then
-				player.Character.Humanoid.Health = 0
-			end
+		spawn(function()
+			criarBotao("Reset Character", function()
+				if player.Character and player.Character:FindFirstChild("Humanoid") then
+					player.Character.Humanoid.Health = 0
+				end
+			end, 0.1)
 		end)
-		criarBotao("Fly Toggle", function()
-			print("Fly ativado/desativado")
+		spawn(function()
+			criarBotao("Fly Toggle", function()
+				print("Fly ativado/desativado")
+			end, 0.15)
 		end)
-		criarBotao("Noclip Toggle", function()
-			print("Noclip ativado/desativado")
+		spawn(function()
+			criarBotao("Noclip Toggle", function()
+				print("Noclip ativado/desativado")
+			end, 0.2)
 		end)
-		criarBotao("Speed Boost", function()
-			if player.Character and player.Character:FindFirstChild("Humanoid") then
-				player.Character.Humanoid.WalkSpeed = 50
-			end
+		spawn(function()
+			criarBotao("Speed Boost", function()
+				if player.Character and player.Character:FindFirstChild("Humanoid") then
+					player.Character.Humanoid.WalkSpeed = 50
+				end
+			end, 0.25)
 		end)
 		
 	elseif nomeAba == "Casas" then
-		criarBotao("Casa 1", function()
-			print("Teleportando para Casa 1")
+		spawn(function()
+			criarBotao("Casa 1", function()
+				print("Teleportando para Casa 1")
+			end, 0.05)
 		end)
-		criarBotao("Casa 2", function()
-			print("Teleportando para Casa 2")
+		spawn(function()
+			criarBotao("Casa 2", function()
+				print("Teleportando para Casa 2")
+			end, 0.1)
 		end)
-		criarBotao("Casa 3", function()
-			print("Teleportando para Casa 3")
+		spawn(function()
+			criarBotao("Casa 3", function()
+				print("Teleportando para Casa 3")
+			end, 0.15)
 		end)
-		criarBotao("Casa Premium", function()
-			print("Teleportando para Casa Premium")
+		spawn(function()
+			criarBotao("Casa Premium", function()
+				print("Teleportando para Casa Premium")
+			end, 0.2)
 		end)
-		criarBotao("Todas as Casas", function()
-			print("Mostrando todas as casas")
+		spawn(function()
+			criarBotao("Todas as Casas", function()
+				print("Mostrando todas as casas")
+			end, 0.25)
 		end)
 		
 	elseif nomeAba == "Carros" then
-		criarBotao("Spawnar Carro", function()
-			print("Spawnando carro")
+		spawn(function()
+			criarBotao("Spawnar Carro", function()
+				print("Spawnando carro")
+			end, 0.1)
 		end)
-		criarBotao("Carro Rápido", function()
-			print("Spawnando carro rápido")
+		spawn(function()
+			criarBotao("Carro Rápido", function()
+				print("Spawnando carro rápido")
+			end, 0.2)
 		end)
-		criarBotao("Carro Voador", function()
-			print("Spawnando carro voador")
+		spawn(function()
+			criarBotao("Carro Voador", function()
+				print("Spawnando carro voador")
+			end, 0.3)
 		end)
-		criarBotao("Remover Carros", function()
-			print("Removendo todos os carros")
+		spawn(function()
+			criarBotao("Remover Carros", function()
+				print("Removendo todos os carros")
+			end, 0.4)
 		end)
-		criarBotao("Teleportar Garagem", function()
-			print("Teleportando para garagem")
+		spawn(function()
+			criarBotao("Teleportar Garagem", function()
+				print("Teleportando para garagem")
+			end, 0.5)
 		end)
 		
 	elseif nomeAba == "Avatar" then
-		criarBotao("Tamanho Normal", function()
-			if player.Character and player.Character:FindFirstChild("Humanoid") then
-				player.Character.Humanoid.HipHeight = 0
-			end
+		spawn(function()
+			criarBotao("Tamanho Normal", function()
+				if player.Character and player.Character:FindFirstChild("Humanoid") then
+					player.Character.Humanoid.HipHeight = 0
+				end
+			end, 0.1)
 		end)
-		criarBotao("Gigante", function()
-			if player.Character and player.Character:FindFirstChild("Humanoid") then
-				player.Character.Humanoid.HipHeight = 10
-			end
+		spawn(function()
+			criarBotao("Gigante", function()
+				if player.Character and player.Character:FindFirstChild("Humanoid") then
+					player.Character.Humanoid.HipHeight = 10
+				end
+			end, 0.2)
 		end)
-		criarBotao("Anão", function()
-			if player.Character and player.Character:FindFirstChild("Humanoid") then
-				player.Character.Humanoid.HipHeight = -2
-			end
+		spawn(function()
+			criarBotao("Anão", function()
+				if player.Character and player.Character:FindFirstChild("Humanoid") then
+					player.Character.Humanoid.HipHeight = -2
+				end
+			end, 0.3)
 		end)
-		criarBotao("Invisível", function()
-			print("Tornando invisível")
+		spawn(function()
+			criarBotao("Invisível", function()
+				print("Tornando invisível")
+			end, 0.4)
 		end)
-		criarBotao("Restaurar Avatar", function()
-			print("Restaurando avatar original")
+		spawn(function()
+			criarBotao("Restaurar Avatar", function()
+				print("Restaurando avatar original")
+			end, 0.5)
 		end)
 		
 	elseif nomeAba == "Fun" then
-		criarBotao("Spam Jump", function()
-			print("Spam jump ativado")
+		spawn(function()
+			criarBotao("Spam Jump", function()
+				print("Spam jump ativado")
+			end, 0.1)
 		end)
-		criarBotao("Dança", function()
-			print("Dançando")
+		spawn(function()
+			criarBotao("Dança", function()
+				print("Dançando")
+			end, 0.2)
 		end)
-		criarBotao("Explosão", function()
-			print("Criando explosão")
+		spawn(function()
+			criarBotao("Explosão", function()
+				print("Criando explosão")
+			end, 0.3)
 		end)
-		criarBotao("Chuva de Objetos", function()
-			print("Chuva de objetos ativada")
+		spawn(function()
+			criarBotao("Chuva de Objetos", function()
+				print("Chuva de objetos ativada")
+			end, 0.4)
 		end)
-		criarBotao("Efeitos Especiais", function()
-			print("Efeitos especiais ativados")
+		spawn(function()
+			criarBotao("Efeitos Especiais", function()
+				print("Efeitos especiais ativados")
+			end, 0.5)
 		end)
 	end
 end
