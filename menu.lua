@@ -148,7 +148,6 @@ end)
 
 close.MouseButton1Click:Connect(function()
     tocarSomClique()
-	gui:Destroy()
 end)
 
 local corner2 = Instance.new("UICorner", close)
@@ -536,3 +535,65 @@ criarAba("Fun", function() mostrarBotoes("Fun") end)
 abaEntrada.BackgroundColor3 = Color3.fromRGB(140, 0, 255)
 abaAtiva = abaEntrada
 mostrarBotoes("Entrada")
+
+-- BOTÃO FLUTUANTE PARA REABRIR MENU
+local botaoReabrir = Instance.new("TextButton", gui)
+botaoReabrir.Size = UDim2.new(0, 50, 0, 50)
+botaoReabrir.Position = UDim2.new(0, 20, 0.5, -25) -- posição inicial
+botaoReabrir.BackgroundColor3 = Color3.fromRGB(140, 0, 255)
+botaoReabrir.Text = "+"
+botaoReabrir.TextColor3 = Color3.new(1, 1, 1)
+botaoReabrir.Font = Enum.Font.GothamBold
+botaoReabrir.TextSize = 30
+botaoReabrir.Visible = false
+botaoReabrir.AutoButtonColor = false
+
+local reabrirCorner = Instance.new("UICorner", botaoReabrir)
+reabrirCorner.CornerRadius = UDim.new(1, 0)
+
+-- Tornar o botão movível (drag)
+local dragging, dragInput, dragStart, startPos
+
+botaoReabrir.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+		dragStart = input.Position
+		startPos = botaoReabrir.Position
+
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
+end)
+
+botaoReabrir.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement then
+		dragInput = input
+	end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+	if input == dragInput and dragging then
+		local delta = input.Position - dragStart
+		botaoReabrir.Position = UDim2.new(
+			startPos.X.Scale, startPos.X.Offset + delta.X,
+			startPos.Y.Scale, startPos.Y.Offset + delta.Y
+		)
+	end
+end)
+
+-- Quando clicar no botão, reabre o menu
+botaoReabrir.MouseButton1Click:Connect(function()
+	tocarSomClique()
+	main.Visible = true
+	botaoReabrir.Visible = false
+end)
+
+-- Modificar o botão de fechar (X) para mostrar esse botão ao fechar
+close.MouseButton1Click:Connect(function()
+	tocarSomClique()
+	main.Visible = false
+	botaoReabrir.Visible = true
+end)
