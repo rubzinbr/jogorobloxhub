@@ -1,4 +1,5 @@
--- Jogoroblox HUB - Estilo Dashboard (Com Animações e Sons)
+--Jogoroblox HUB--
+
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local SoundService = game:GetService("SoundService")
@@ -383,7 +384,7 @@ local function mostrarBotoes(nomeAba)
     limparBotoes()
     
     -- Botões específicos para cada aba com animação sequencial
-    if nomeAba == "Entrada" then
+    if nomeAba == "Player" then
         spawn(function()
             criarBotao("Teleportar Spawn", function()
                 if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
@@ -470,7 +471,7 @@ local function mostrarBotoes(nomeAba)
             end, 0.5)
         end)
         
-    elseif nomeAba == "Avatar" then
+    elseif nomeAba == "Troll" then
         spawn(function()
             criarBotao("Tamanho Normal", function()
                 if player.Character and player.Character:FindFirstChild("Humanoid") then
@@ -532,17 +533,17 @@ local function mostrarBotoes(nomeAba)
     end
 end
 
--- Criar abas
-local abaEntrada = criarAba("Entrada", function() mostrarBotoes("Entrada") end)
+-- Criar abas com os novos nomes
+local abaPlayer = criarAba("Player", function() mostrarBotoes("Player") end)
 criarAba("Casas", function() mostrarBotoes("Casas") end)
 criarAba("Carros", function() mostrarBotoes("Carros") end)
-criarAba("Avatar", function() mostrarBotoes("Avatar") end)
+criarAba("Troll", function() mostrarBotoes("Troll") end)
 criarAba("Fun", function() mostrarBotoes("Fun") end)
 
 -- Selecionar primeira aba por padrão
-abaEntrada.BackgroundColor3 = Color3.fromRGB(140, 0, 255)
-abaAtiva = abaEntrada
-mostrarBotoes("Entrada")
+abaPlayer.BackgroundColor3 = Color3.fromRGB(140, 0, 255)
+abaAtiva = abaPlayer
+mostrarBotoes("Player")
 print("Abas e botões inicializados.")
 
 -- BOTÃO FLUTUANTE PARA REABRIR MENU
