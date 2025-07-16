@@ -270,7 +270,43 @@ local keyCorreta = "jogoroblox123"
 botao.MouseButton1Click:Connect(function()
     if caixa.Text == keyCorreta then
         gui:Destroy()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/rubzinbr/jogorobloxhub/main/menu_brookhaven.lua"))()
+       
+        -- Carregador automático por jogo (após key correta) - VERSÃO CORRIGIDA
+        local placeId = game.PlaceId
+        
+        -- Debug: Mostrar PlaceId atual para diagnóstico
+        print("PlaceId atual:", placeId)
+        
+        local scripts = {
+            [537413528] = "https://raw.githubusercontent.com/rubzinbr/jogorobloxhub/main/menu_brookhaven.lua", -- Brookhaven antigo
+            [4924922222] = "https://raw.githubusercontent.com/rubzinbr/jogorobloxhub/main/menu_brookhaven.lua", -- Brookhaven atual
+            [15502339019] = "https://raw.githubusercontent.com/rubzinbr/jogorobloxhub/main/menuvape.lua",
+            [6516141723] = "https://raw.githubusercontent.com/rubzinbr/jogorobloxhub/main/menudoors.lua"
+        }
+        
+        -- Verificação específica para Brookhaven
+        if string.find(game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name:lower(), "brookhaven") then
+            print("Brookhaven detectado pelo nome do jogo!")
+            url = "https://raw.githubusercontent.com/rubzinbr/jogorobloxhub/main/menu_brookhaven.lua"
+        end
+        
+        -- Verificação mais explícita para debug
+        local url
+        if scripts[placeId] then
+            url = scripts[placeId]
+            print("Jogo específico detectado! PlaceId:", placeId)
+            print("Carregando menu específico:", url)
+        else
+            url = "https://raw.githubusercontent.com/rubzinbr/jogorobloxhub/main/menu_principal.lua"
+            print("Jogo não reconhecido ou menu principal solicitado")
+            print("Carregando menu principal:", url)
+        end
+        
+        -- Verificação adicional: forçar menu principal se necessário
+        -- Descomente a linha abaixo para sempre carregar o menu principal
+        -- url = "https://raw.githubusercontent.com/rubzinbr/jogorobloxhub/main/menu_principal.lua"
+        
+        loadstring(game:HttpGet(url))()
     else
         caixa.Text = ""
         caixa.PlaceholderText = "Key incorreta!"
