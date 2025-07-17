@@ -530,6 +530,67 @@ local function mostrarBotoes(nomeAba)
                 print("Efeitos especiais ativados")
             end, 0.5)
         end)
+        
+    elseif nomeAba == "Música" then
+        spawn(function()
+            criarBotao("Tocar Música", function()
+                local musica = Instance.new("Sound")
+                musica.SoundId = "rbxassetid://1837829367" -- Exemplo de música (substitua por ID válida)
+                musica.Volume = 0.5
+                musica.Looped = true
+                musica.Parent = gui
+                musica:Play()
+                print("Música tocando.")
+            end, 0.1)
+        end)
+        spawn(function()
+            criarBotao("Parar Música", function()
+                for _, sound in pairs(gui:GetChildren()) do
+                    if sound:IsA("Sound") and sound.Playing then
+                        sound:Stop()
+                        sound:Destroy()
+                        print("Música parada.")
+                    end
+                end
+            end, 0.2)
+        end)
+        spawn(function()
+            criarBotao("Aumentar Volume", function()
+                for _, sound in pairs(gui:GetChildren()) do
+                    if sound:IsA("Sound") and sound.Playing then
+                        sound.Volume = math.min(sound.Volume + 0.1, 1)
+                        print("Volume aumentado para:", sound.Volume)
+                    end
+                end
+            end, 0.3)
+        end)
+        spawn(function()
+            criarBotao("Diminuir Volume", function()
+                for _, sound in pairs(gui:GetChildren()) do
+                    if sound:IsA("Sound") and sound.Playing then
+                        sound.Volume = math.max(sound.Volume - 0.1, 0)
+                        print("Volume diminuído para:", sound.Volume)
+                    end
+                end
+            end, 0.4)
+        end)
+        spawn(function()
+            criarBotao("Mudar Música", function()
+                local musica = Instance.new("Sound")
+                musica.SoundId = "rbxassetid://1838458851" -- Outro exemplo de ID (substitua por ID válida)
+                musica.Volume = 0.5
+                musica.Looped = true
+                musica.Parent = gui
+                for _, sound in pairs(gui:GetChildren()) do
+                    if sound:IsA("Sound") and sound.Playing and sound ~= musica then
+                        sound:Stop()
+                        sound:Destroy()
+                    end
+                end
+                musica:Play()
+                print("Música mudada.")
+            end, 0.5)
+        end)
     end
 end
 
@@ -539,6 +600,7 @@ criarAba("Casas", function() mostrarBotoes("Casas") end)
 criarAba("Carros", function() mostrarBotoes("Carros") end)
 criarAba("Troll", function() mostrarBotoes("Troll") end)
 criarAba("Fun", function() mostrarBotoes("Fun") end)
+criarAba("Música", function() mostrarBotoes("Música") end) -- Nova aba "Música"
 
 -- Selecionar primeira aba por padrão
 abaPlayer.BackgroundColor3 = Color3.fromRGB(140, 0, 255)
