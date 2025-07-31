@@ -2,6 +2,7 @@
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local SoundService = game:GetService("SoundService")
+local RunService = game:GetService("RunService")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
@@ -372,10 +373,106 @@ local function limparBotoes()
     todosBotoes = {}
     
     for _, child in pairs(painelBotoes:GetChildren()) do
-        if child:IsA("TextButton") and child ~= close then
+        if child:IsA("TextButton") and child ~= close or child:IsA("Frame") then
             child:Destroy()
         end
     end
+end
+
+-- Variáveis globais para o player de música
+local sound = Instance.new("Sound")
+sound.Volume = 0.5
+sound.Parent = gui
+local playlist = {}
+local currentIndex = 1
+local isPlaying = false
+
+-- Função para criar item da lista com destaque roxo
+local function createListItem(id, index, listFrame)
+    local item = Instance.new("TextButton")
+    item.Name = "Item_" .. index
+    item.Size = UDim2.new(1, -10, 0, 30)
+    item.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    item.TextColor3 = Color3.fromRGB(255, 255, 255)
+    item.Font = Enum.Font.SourceSans
+    item.TextSize = 14
+    item.Text = "🎵 ID: " .. id
+    item.TextXAlignment = Enum.TextXAlignment.Left
+    item.Parent = listFrame
+    
+    local itemCorner = Instance.new("UICorner")
+    itemCorner.CornerRadius = UDim.new(0, 3)
+    itemCorner.Parent = item
+    
+    -- Atualizar cor se for o item atual
+    if index == currentIndex and isPlaying then
+        item.BackgroundColor3 = Color3.fromRGB(140, 0, 255)
+    end
+    
+    -- Clique para tocar
+    item.MouseButton1Click:Connect(function()
+        currentIndex = index
+        playMusic()
+        -- Atualizar cores de todos os itens
+        for i, child in pairs(listFrame:GetChildren()) do
+            if child:IsA("TextButton") then
+                child.BackgroundColor3 = (child.Name == "Item_" .. currentIndex) and Color3.fromRGB(140, 0, 255) or Color3.fromRGB(50, 50, 50)
+            end
+        end
+    end)
+    
+    return item
+end
+
+-- Função para tocar música
+function playMusic()
+    if #playlist > 0 then
+        sound:Stop()
+        sound.SoundId = "rbxassetid://" .. playlist[currentIndex]
+        sound:Play()
+        isPlaying = true
+        -- Atualizar cores após tocar
+        local listFrame = painelBotoes:FindFirstChild("MusicPlayerFrame"):FindFirstChild("ListFrame")
+        if listFrame then
+            for i, child in pairs(listFrame:GetChildren()) do
+                if child:IsA("TextButton") then
+                    child.BackgroundColor3 = (child.Name == "Item_" .. currentIndex) and Color3.fromRGB(140, 0, 255) or Color3.fromRGB(50, 50, 50)
+                end
+            end
+        end
+    end
+end
+
+-- Função para pausar música
+function pauseMusic()
+    sound:Pause()
+    isPlaying = false
+end
+
+-- Função para adicionar música com salvamento local
+local savedPlaylist = {}
+local function addMusic(id, listFrame)
+    if id and id ~= "" then
+        table.insert(playlist, id)
+        createListItem(id, #playlist, listFrame)
+        
+        -- Salvar localmente
+        table.insert(savedPlaylist, id)
+        
+        -- Atualizar tamanho da lista
+        listFrame.CanvasSize = UDim2.new(0, 0, 0, #playlist * 32)
+        
+        print("Música adicionada e salva localmente: " .. id)
+    end
+end
+
+-- Carregar playlist salva ao iniciar a aba Música
+local function loadSavedPlaylist(listFrame)
+    for _, id in pairs(savedPlaylist) do
+        table.insert(playlist, id)
+        createListItem(id, #playlist, listFrame)
+    end
+    listFrame.CanvasSize = UDim2.new(0, 0, 0, #playlist * 32)
 end
 
 -- Criar botões da aba
@@ -531,65 +628,212 @@ local function mostrarBotoes(nomeAba)
         end)
         
     elseif nomeAba == "Música" then
-        spawn(function()
-            criarBotao("Tocar Música", function()
-                local musica = Instance.new("Sound")
-                musica.SoundId = "rbxassetid://1837829367" -- Exemplo: música do Roblox (verifique IDs válidos)
-                musica.Volume = 0.5
-                musica.Looped = true
-                musica.Parent = gui
-                musica:Play()
-                print("Música tocando.")
-            end, 0.1)
+        -- Frame principal do Music Player
+        local mainFrame = Instance.new("Frame")
+        mainFrame.Name = "MusicPlayerFrame"
+        mainFrame.Size = UDim2.new(0, 400, 0, 300)
+        mainFrame.Position = UDim2.new(0.5, -200, 0.5, -150)
+        mainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+        mainFrame.BorderSizePixel = 0
+        mainFrame.Parent = painelBotoes
+
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, 10)
+        corner.Parent = mainFrame
+
+        -- Título
+        local title = Instance.new("TextLabel")
+        title.Name = "Title"
+        title.Size = UDim2.new(1, 0, 0, 40)
+        title.Position = UDim2.new(0, 0, 0, 0)
+        title.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+        title.TextColor3 = Color3.fromRGB(255, 255, 255)
+        title.Font = Enum.Font.SourceSansBold
+        title.TextSize = 20
+        title.Text = "🎵 Music Player"
+        title.Parent = mainFrame
+
+        local titleCorner = Instance.new("UICorner")
+        titleCorner.CornerRadius = UDim.new(0, 10)
+        titleCorner.Parent = title
+
+        -- Input para ID da música
+        local inputFrame = Instance.new("Frame")
+        inputFrame.Name = "InputFrame"
+        inputFrame.Size = UDim2.new(1, -20, 0, 40)
+        inputFrame.Position = UDim2.new(0, 10, 0, 50)
+        inputFrame.BackgroundTransparency = 1
+        inputFrame.Parent = mainFrame
+
+        local inputBox = Instance.new("TextBox")
+        inputBox.Name = "InputBox"
+        inputBox.Size = UDim2.new(1, -80, 1, 0)
+        inputBox.Position = UDim2.new(0, 0, 0, 0)
+        inputBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+        inputBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+        inputBox.Font = Enum.Font.SourceSans
+        inputBox.TextSize = 16
+        inputBox.PlaceholderText = "Digite o ID da música..."
+        inputBox.Text = ""
+        inputBox.Parent = inputFrame
+
+        local inputCorner = Instance.new("UICorner")
+        inputCorner.CornerRadius = UDim.new(0, 5)
+        inputCorner.Parent = inputBox
+
+        local addButton = Instance.new("TextButton")
+        addButton.Name = "AddButton"
+        addButton.Size = UDim2.new(0, 70, 1, 0)
+        addButton.Position = UDim2.new(1, -70, 0, 0)
+        addButton.BackgroundColor3 = Color3.fromRGB(90, 0, 180)
+        addButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        addButton.Font = Enum.Font.Gotham
+        addButton.TextSize = 14
+        addButton.Text = "Adicionar"
+        addButton.Parent = inputFrame
+
+        local addCorner = Instance.new("UICorner")
+        addCorner.CornerRadius = UDim.new(0, 6)
+        addCorner.Parent = addButton
+
+        -- Lista de músicas
+        local listFrame = Instance.new("ScrollingFrame")
+        listFrame.Name = "ListFrame"
+        listFrame.Size = UDim2.new(1, -20, 0, 120)
+        listFrame.Position = UDim2.new(0, 10, 0, 100)
+        listFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+        listFrame.BorderSizePixel = 0
+        listFrame.ScrollBarThickness = 8
+        listFrame.Parent = mainFrame
+
+        local listCorner = Instance.new("UICorner")
+        listCorner.CornerRadius = UDim.new(0, 5)
+        listCorner.Parent = listFrame
+
+        local listLayout = Instance.new("UIListLayout")
+        listLayout.SortOrder = Enum.SortOrder.LayoutOrder
+        listLayout.Padding = UDim.new(0, 2)
+        listLayout.Parent = listFrame
+
+        -- Controles do player
+        local controlsFrame = Instance.new("Frame")
+        controlsFrame.Name = "ControlsFrame"
+        controlsFrame.Size = UDim2.new(1, -20, 0, 50)
+        controlsFrame.Position = UDim2.new(0, 10, 0, 230)
+        controlsFrame.BackgroundTransparency = 1
+        controlsFrame.Parent = mainFrame
+
+        -- Botão Voltar
+        local prevButton = Instance.new("TextButton")
+        prevButton.Name = "PrevButton"
+        prevButton.Size = UDim2.new(0, 70, 0, 40)
+        prevButton.Position = UDim2.new(0.5, -110, 0, 5)
+        prevButton.BackgroundColor3 = Color3.fromRGB(90, 0, 180)
+        prevButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        prevButton.Font = Enum.Font.Gotham
+        prevButton.TextSize = 14
+        prevButton.Text = "Voltar"
+        prevButton.Parent = controlsFrame
+
+        local prevCorner = Instance.new("UICorner")
+        prevCorner.CornerRadius = UDim.new(0, 6)
+        prevCorner.Parent = prevButton
+
+        -- Botão Play/Pause
+        local playButton = Instance.new("TextButton")
+        playButton.Name = "PlayButton"
+        playButton.Size = UDim2.new(0, 70, 0, 50)
+        playButton.Position = UDim2.new(0.5, -35, 0, 0)
+        playButton.BackgroundColor3 = Color3.fromRGB(90, 0, 180)
+        playButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        playButton.Font = Enum.Font.Gotham
+        playButton.TextSize = 20
+        playButton.Text = isPlaying and "⏸" or "▶"
+        playButton.Parent = controlsFrame
+
+        local playCorner = Instance.new("UICorner")
+        playCorner.CornerRadius = UDim.new(0, 6)
+        playCorner.Parent = playButton
+
+        -- Botão Próxima
+        local nextButton = Instance.new("TextButton")
+        nextButton.Name = "NextButton"
+        nextButton.Size = UDim2.new(0, 70, 0, 40)
+        nextButton.Position = UDim2.new(0.5, 40, 0, 5)
+        nextButton.BackgroundColor3 = Color3.fromRGB(90, 0, 180)
+        nextButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        nextButton.Font = Enum.Font.Gotham
+        nextButton.TextSize = 14
+        nextButton.Text = "Próxima"
+        nextButton.Parent = controlsFrame
+
+        local nextCorner = Instance.new("UICorner")
+        nextCorner.CornerRadius = UDim.new(0, 6)
+        nextCorner.Parent = nextButton
+
+        -- Eventos dos botões
+        addButton.MouseButton1Click:Connect(function()
+            addMusic(inputBox.Text, listFrame)
+            inputBox.Text = ""
         end)
-        spawn(function()
-            criarBotao("Parar Música", function()
-                for _, sound in pairs(gui:GetChildren()) do
-                    if sound:IsA("Sound") and sound.Playing then
-                        sound:Stop()
-                        sound:Destroy()
-                        print("Música parada.")
-                    end
+
+        inputBox.FocusLost:Connect(function(enterPressed)
+            if enterPressed then
+                addMusic(inputBox.Text, listFrame)
+                inputBox.Text = ""
+            end
+        end)
+
+        playButton.MouseButton1Click:Connect(function()
+            if isPlaying then
+                pauseMusic()
+                playButton.Text = "▶"
+            else
+                playMusic()
+                playButton.Text = "⏸"
+            end
+        end)
+
+        prevButton.MouseButton1Click:Connect(function()
+            if #playlist > 0 then
+                currentIndex = currentIndex - 1
+                if currentIndex < 1 then
+                    currentIndex = #playlist
                 end
-            end, 0.2)
+                playMusic()
+                playButton.Text = "⏸"
+            end
         end)
-        spawn(function()
-            criarBotao("Aumentar Volume", function()
-                for _, sound in pairs(gui:GetChildren()) do
-                    if sound:IsA("Sound") and sound.Playing then
-                        sound.Volume = math.min(sound.Volume + 0.1, 1)
-                        print("Volume aumentado para:", sound.Volume)
-                    end
+
+        nextButton.MouseButton1Click:Connect(function()
+            if #playlist > 0 then
+                currentIndex = currentIndex + 1
+                if currentIndex > #playlist then
+                    currentIndex = 1
                 end
-            end, 0.3)
+                playMusic()
+                playButton.Text = "⏸"
+            end
         end)
-        spawn(function()
-            criarBotao("Diminuir Volume", function()
-                for _, sound in pairs(gui:GetChildren()) do
-                    if sound:IsA("Sound") and sound.Playing then
-                        sound.Volume = math.max(sound.Volume - 0.1, 0)
-                        print("Volume diminuído para:", sound.Volume)
-                    end
-                end
-            end, 0.4)
-        end)
-        spawn(function()
-            criarBotao("Mudar Música", function()
-                local musica = Instance.new("Sound")
-                musica.SoundId = "rbxassetid://1838458851" -- Outro exemplo de ID (verifique IDs válidos)
-                musica.Volume = 0.5
-                musica.Looped = true
-                musica.Parent = gui
-                for _, sound in pairs(gui:GetChildren()) do
-                    if sound:IsA("Sound") and sound.Playing and sound ~= musica then
-                        sound:Stop()
-                        sound:Destroy()
-                    end
-                end
-                musica:Play()
-                print("Música mudada.")
-            end, 0.5)
-        end)
+
+        -- Efeitos hover nos botões do player
+        local function addHoverEffect(button)
+            button.MouseEnter:Connect(function()
+                button.BackgroundColor3 = Color3.fromRGB(140, 0, 255)
+            end)
+            
+            button.MouseLeave:Connect(function()
+                button.BackgroundColor3 = Color3.fromRGB(90, 0, 180)
+            end)
+        end
+
+        addHoverEffect(addButton)
+        addHoverEffect(prevButton)
+        addHoverEffect(playButton)
+        addHoverEffect(nextButton)
+
+        -- Carregar playlist salva ao abrir a aba
+        loadSavedPlaylist(listFrame)
     end
 end
 
